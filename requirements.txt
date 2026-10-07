@@ -1,3 +1,12 @@
+# If not already create a python enviroment
+    # python3 -m venv <env name>
+    # source <env name>/bin/activate
+# Before this Run: 
+    # pip3 install --upgrade pip setuptools wheel
+# Install with: 
+    # pip3 install -r requirements.txt
+
+
 Flask==3.1.0
 gunicorn==23.0.0
 pymongo==4.10.1

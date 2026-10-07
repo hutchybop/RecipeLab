@@ -21,7 +21,7 @@ class AppConfig:
         return cls(
             secret_key=os.getenv("SECRET_KEY", ""),
             mongo_uri=os.getenv("MONGO_URI", ""),
-            mongo_db_name=os.getenv("MONGO_DB_NAME", "recipes_app"),
+            mongo_db_name=os.getenv("MONGO_DB_NAME", "RecipeLab"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
         )
 
