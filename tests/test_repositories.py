@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import unittest
+
+from app.repositories import (
+    FeedbackEventsRepository,
+    GenerationRunsRepository,
+    PreferencesRepository,
+    RecipesRepository,
+    SuggestionsRepository,
+)
+
+from tests.fakes import FakeDatabase
+
+
+class RepositoryTests(unittest.TestCase):
+    def setUp(self):
+        self.db = FakeDatabase()
+
+    def test_recipes_repository_create_and_list(self):
+        repository = RecipesRepository(self.db)
+
+        repository.create(
+            {
+                "title": "Chicken Pilaf",
+                "meal_type": "main",
+                "ingredients": ["300 g chicken breast"],
+                "method": ["Cook"],
+                "source_type": "user",
+            }
+        )
+
+        recipes = repository.list()
+        self.assertEqual(len(recipes), 1)
+        self.assertEqual(recipes[0]["title"], "Chicken Pilaf")
+
+    def test_suggestions_repository_create_and_status_update(self):
+        repository = SuggestionsRepository(self.db)
+        suggestion = repository.create({"title": "New Dish", "meal_type": "main"})
+
+        self.assertEqual(suggestion["status"], "draft")
+        updated = repository.update_status(suggestion["_id"], "accepted")
+        self.assertTrue(updated)
+
+        found = repository.get_by_id(suggestion["_id"])
+        assert found is not None
+        self.assertEqual(found["status"], "accepted")
+
+    def test_preferences_repository_upsert_profile(self):
+        repository = PreferencesRepository(self.db)
+        repository.upsert_profile({"profile_name": "default", "active": True})
+        repository.upsert_profile({"profile_name": "weekend", "active": True})
+
+        active = repository.get_active_profile()
+        assert active is not None
+        self.assertEqual(active["profile_name"], "weekend")
+
+    def test_feedback_events_repository_create(self):
+        repository = FeedbackEventsRepository(self.db)
+        repository.create({"target_type": "recipe", "target_id": "r1", "signal": "liked"})
+
+        events = repository.list_for_target(target_type="recipe", target_id="r1")
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "liked")
+
+    def test_generation_runs_repository_create_and_update_status(self):
+        repository = GenerationRunsRepository(self.db)
+        run = repository.create({"meal_type": "main", "model": "gpt-test"})
+        updated = repository.update_status(run["_id"], "succeeded", raw_response="{}")
+
+        self.assertTrue(updated)
+        found = repository.get_by_id(run["_id"])
+        assert found is not None
+        self.assertEqual(found["status"], "succeeded")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -396,7 +396,7 @@ Update this file at every checkpoint.
 ### Phase Status Tracker
 - Phase 0: `complete`
 - Phase 1: `complete`
-- Phase 2: `not_started`
+- Phase 2: `complete`
 - Phase 3: `not_started`
 - Phase 4: `not_started`
 - Phase 5: `not_started`
@@ -453,8 +453,61 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-08
+
+- Phase: 2 / Data Model and Repositories
+- Status: `in_progress`
+- What changed:
+  - Added schema normalization and validation utilities for recipes, suggestions, preferences, feedback events, and generation runs.
+  - Added repository modules for all Phase 2 collections under `app/repositories/`.
+  - Added collection index definitions and an aggregate `ensure_all_indexes()` helper.
+  - Added optional markdown import script `scripts/import_markdown_recipes.py` for seeding/upserting `recipes/` content.
+  - Added Phase 2 test suite under `tests/` (schema, repository, and index checks).
+- Tests run:
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app scripts tests run.py`
+- User validation outcome:
+  - Pending user verification of imported/seeded data shape and usability.
+- Risks/issues:
+  - Import script maps meal type by recipe path conventions; new folder structures may need mapping updates.
+- Decision(s):
+  - Keep repository and schema layers framework-agnostic so they can be reused by future API/UI phases.
+  - Keep index creation explicit via helper call instead of app-start auto-run to preserve degraded startup behavior when Mongo is unavailable.
+- Next actions:
+  - Run the import script against the target MongoDB and confirm data shape for Phase 2 gate.
+  - Integrate repositories into generation endpoints during Phase 3.
+
+---
+
+## Checkpoint 2026-10-08 (Phase 2 Validation Gate - Pending Finalization)
+
+- Phase: 2 / Data Model and Repositories
+- Status: `in_progress`
+- What changed:
+  - Executed Phase 2 UAT checklist (`docs/checklists/phase-2-uat.md`).
+  - Ran real markdown import and validated stored recipe shape/usability.
+  - Verified required collection indexes are present.
+- Tests run:
+  - `.venv/bin/python scripts/import_markdown_recipes.py`
+  - Data-shape verification commands from `docs/checklists/phase-2-uat.md`
+  - Index verification commands from `docs/checklists/phase-2-uat.md`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - `N/A`
+- Next actions:
+  - If PASS: set Phase 2 status tracker to `complete` and begin Phase 3.
+  - If FAIL: add remediation tasks and keep Phase 2 `in_progress`.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
 - Initial project plan created from agreed requirements and phased delivery strategy.
 - Phase 1 scaffold completed with health check and Docker baseline.
+
+### 2026-10-08
+- Phase 2 persistence foundation added (schemas, repositories, indexes, tests, and markdown import tooling).
