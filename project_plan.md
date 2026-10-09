@@ -428,7 +428,7 @@ Update this file at every checkpoint.
 - Phase 5: `complete`
 - Phase 6: `complete`
 - Phase 6.1: `complete`
-- Phase 7: `not_started`
+- Phase 7: `complete`
 - Phase 8: `not_started`
 
 ### Checkpoint Log Template
@@ -664,6 +664,54 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09
+
+- Phase: 7 / PDF Export and Runtime Settings UX
+- Status: `in_progress`
+- What changed:
+  - Added simple recipe PDF export route (`GET /recipes/<id>/pdf`) and PDF rendering service.
+  - Added settings page (`/settings`) for runtime model selection only.
+  - Added runtime settings persistence (`runtime_settings`) and indexing.
+  - Added read-only provider/endpoint display in settings (env-managed source).
+  - Updated generate/import pages to show active model from settings rather than freeform override input.
+  - Added navigation entry for Settings and Export PDF action on recipe detail page.
+  - Added tests for PDF export, settings persistence, runtime model usage, repository behavior, and indexes.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes tests.test_runtime_settings tests.test_repositories tests.test_indexes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending Phase 7 UAT for PDF quality and model-switch behavior.
+- Risks/issues:
+  - PDF output is intentionally plain text layout for MVP simplicity.
+- Decision(s):
+  - Keep provider/endpoint/API key read-only in UI; model remains the only runtime-editable LLM setting.
+- Next actions:
+  - Run Phase 7 UAT checklist and gather PDF readability feedback.
+  - Promote Phase 7 to `complete` after user validation gate passes.
+
+---
+
+## Checkpoint 2026-10-09 (Phase 7 Validation Gate)
+
+- Phase: 7 / PDF Export and Runtime Settings UX
+- Status: `complete`
+- What changed:
+  - User completed Phase 7 UAT checklist and validated runtime model switching and PDF export flow.
+- Tests run:
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Promote Phase 7 to `complete`.
+- Next actions:
+  - Begin Phase 8 (Docker release and GHCR automation).
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -687,3 +735,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 6.1 feedback visibility started (current-state indicators and history for feedback + applied/rejected profile suggestion history UI).
+
+### 2026-10-09
+- Phase 7 utility features started (PDF export and runtime model settings page with env-managed provider/endpoint display).

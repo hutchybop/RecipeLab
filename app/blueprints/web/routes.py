@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, url_for
 
 from ...extensions import get_mongo_db
 from ...repositories import (
@@ -8,16 +8,21 @@ from ...repositories import (
     PreferencesRepository,
     ProfileUpdateSuggestionsRepository,
     RecipesRepository,
+    RuntimeSettingsRepository,
     SuggestionsRepository,
 )
 from ...services import (
     MEAL_TYPES,
     apply_profile_update_suggestion,
     convert_raw_recipe_to_suggestion,
+    get_allowed_models,
+    get_effective_model,
     generate_profile_update_suggestions,
     generate_recipe_suggestion,
     normalize_recipe_document,
+    pdf_filename_for_recipe,
     reject_profile_update_suggestion,
+    render_recipe_pdf,
 )
 
 
@@ -46,12 +51,11 @@ def index() -> str:
 def generate_page() -> str:
     selected_meal_type = "main"
     instructions = ""
-    model_override = ""
+    db = get_mongo_db()
 
     if request.method == "POST":
         selected_meal_type = str(request.form.get("meal_type", "main")).strip()
         instructions = str(request.form.get("instructions", "")).strip()
-        model_override = str(request.form.get("model", "")).strip()
 
         if selected_meal_type not in MEAL_TYPES:
             flash("Please select a valid meal type.", "danger")
@@ -59,10 +63,9 @@ def generate_page() -> str:
 
         try:
             result = generate_recipe_suggestion(
-                db=get_mongo_db(),
+                db=db,
                 meal_type=selected_meal_type,
                 instructions=instructions,
-                model_override=model_override or None,
             )
         except Exception:
             flash(
@@ -88,7 +91,7 @@ def generate_page() -> str:
         meal_types=sorted(MEAL_TYPES),
         selected_meal_type=selected_meal_type,
         instructions=instructions,
-        model_override=model_override,
+        current_model=get_effective_model(db),
     )
 
 
@@ -262,12 +265,11 @@ def recipes_page() -> str:
 def import_recipe_page() -> str:
     selected_meal_type = "main"
     raw_recipe_text = ""
-    model_override = ""
+    db = get_mongo_db()
 
     if request.method == "POST":
         selected_meal_type = str(request.form.get("meal_type", "main")).strip()
         raw_recipe_text = str(request.form.get("raw_recipe_text", "")).strip()
-        model_override = str(request.form.get("model", "")).strip()
 
         if selected_meal_type not in MEAL_TYPES:
             flash("Please select a valid meal type.", "danger")
@@ -279,10 +281,9 @@ def import_recipe_page() -> str:
 
         try:
             result = convert_raw_recipe_to_suggestion(
-                db=get_mongo_db(),
+                db=db,
                 meal_type=selected_meal_type,
                 raw_recipe_text=raw_recipe_text,
-                model_override=model_override or None,
             )
         except Exception:
             flash(
@@ -307,7 +308,35 @@ def import_recipe_page() -> str:
         meal_types=sorted(MEAL_TYPES),
         selected_meal_type=selected_meal_type,
         raw_recipe_text=raw_recipe_text,
-        model_override=model_override,
+        current_model=get_effective_model(db),
+    )
+
+
+@web_bp.route("/settings", methods=["GET", "POST"])
+def settings_page() -> str:
+    db = get_mongo_db()
+    settings_repo = RuntimeSettingsRepository(db)
+    allowed_models = get_allowed_models()
+
+    if request.method == "POST":
+        selected_model = str(request.form.get("model", "")).strip()
+        if selected_model not in allowed_models:
+            flash("Invalid model selection.", "danger")
+            return redirect(url_for("web.settings_page"))
+        settings_repo.set_selected_model(selected_model)
+        flash("Runtime model updated.", "success")
+        return redirect(url_for("web.settings_page"))
+
+    current_model = get_effective_model(db)
+    provider = str(current_app.config.get("LLM_PROVIDER", "")).strip()
+    endpoint = str(current_app.config.get("LLM_ENDPOINT", "")).strip()
+
+    return render_template(
+        "settings.html",
+        allowed_models=allowed_models,
+        current_model=current_model,
+        provider=provider,
+        endpoint=endpoint,
     )
 
 
@@ -328,6 +357,23 @@ def recipe_detail(recipe_id: str) -> str:
         recipe=recipe,
         feedback_state=feedback_state,
         feedback_history=feedback_history,
+    )
+
+
+@web_bp.get("/recipes/<recipe_id>/pdf")
+def export_recipe_pdf(recipe_id: str):
+    db = get_mongo_db()
+    recipe = RecipesRepository(db).get_by_id(recipe_id)
+    if not recipe or recipe.get("deleted_at") is not None:
+        flash("Recipe not found.", "warning")
+        return redirect(url_for("web.recipes_page"))
+
+    pdf_bytes = render_recipe_pdf(recipe)
+    filename = pdf_filename_for_recipe(recipe)
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 

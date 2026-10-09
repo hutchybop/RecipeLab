@@ -19,6 +19,7 @@ class AppConfig:
     llm_endpoint: str
     llm_api_key: str
     llm_model: str
+    llm_allowed_models: str
 
     @classmethod
     def from_env(cls) -> "AppConfig":
@@ -31,6 +32,7 @@ class AppConfig:
             llm_endpoint=os.getenv("LLM_ENDPOINT", ""),
             llm_api_key=os.getenv("LLM_API_KEY", ""),
             llm_model=os.getenv("LLM_MODEL", ""),
+            llm_allowed_models=os.getenv("LLM_ALLOWED_MODELS", ""),
         )
 
     def validate(self) -> list[str]:
@@ -51,4 +53,5 @@ class AppConfig:
             "LLM_ENDPOINT": self.llm_endpoint,
             "LLM_API_KEY": self.llm_api_key,
             "LLM_MODEL": self.llm_model,
+            "LLM_ALLOWED_MODELS": self.llm_allowed_models,
         }

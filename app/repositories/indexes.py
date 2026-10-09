@@ -7,6 +7,7 @@ from .generation_runs_repository import GenerationRunsRepository
 from .preferences_repository import PreferencesRepository
 from .profile_update_suggestions_repository import ProfileUpdateSuggestionsRepository
 from .recipes_repository import RecipesRepository
+from .runtime_settings_repository import RuntimeSettingsRepository
 from .suggestions_repository import SuggestionsRepository
 
 
@@ -17,3 +18,4 @@ def ensure_all_indexes(db: Database) -> None:
     FeedbackEventsRepository.ensure_indexes(db)
     GenerationRunsRepository.ensure_indexes(db)
     ProfileUpdateSuggestionsRepository.ensure_indexes(db)
+    RuntimeSettingsRepository.ensure_indexes(db)

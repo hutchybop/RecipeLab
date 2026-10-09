@@ -15,6 +15,25 @@ pending
 ---
 <br>
 
+## Session 10
+### Friday October 9th
+<br>
+
+**Summary:** This session started Phase 7. It added runtime settings UI for model selection, persisted selected model settings, and implemented recipe PDF export from recipe detail.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- add runtime settings persistence - *Added `runtime_settings` repository and index for selected generation model.*
+- add settings page UX - *Added `/settings` page with model allow-list selection and read-only provider/endpoint display.*
+- add recipe pdf export - *Added `/recipes/<id>/pdf` route and simple PDF rendering service with export action button.*
+- expand phase 7 tests and checklist - *Added route/repository/runtime-model tests and created `docs/checklists/phase-7-uat.md`.*
+- phase 7 validation complete - *User passed Phase 7 UAT; phase promoted to complete in `project_plan.md`.*
+---
+<br>
+
 ## Session 9
 ### Friday October 9th
 <br>

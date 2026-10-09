@@ -6,7 +6,13 @@ from typing import Any, Mapping
 from flask import current_app
 from pymongo.database import Database
 
-from ..repositories import GenerationRunsRepository, PreferencesRepository, SuggestionsRepository, ensure_all_indexes
+from ..repositories import (
+    GenerationRunsRepository,
+    PreferencesRepository,
+    RuntimeSettingsRepository,
+    SuggestionsRepository,
+    ensure_all_indexes,
+)
 from .llm_adapter import LLMAdapter, LLMAdapterError
 from .prompt_composer import compose_canonical_conversion_prompt, compose_recipe_prompt
 from .schema_utils import normalize_recipe_document
@@ -20,7 +26,7 @@ def generate_recipe_suggestion(*, db: Database, meal_type: str, instructions: st
     preferences_repository = PreferencesRepository(db)
 
     profile = preferences_repository.get_active_profile() or {}
-    model = (model_override or current_app.config.get("LLM_MODEL", "")).strip()
+    model = _resolve_generation_model(db=db, model_override=model_override)
     provider = current_app.config.get("LLM_PROVIDER", "").strip()
     endpoint = current_app.config.get("LLM_ENDPOINT", "").strip()
     api_key = current_app.config.get("LLM_API_KEY", "").strip()
@@ -106,7 +112,7 @@ def convert_raw_recipe_to_suggestion(
     generation_runs_repository = GenerationRunsRepository(db)
     suggestions_repository = SuggestionsRepository(db)
 
-    model = (model_override or current_app.config.get("LLM_MODEL", "")).strip()
+    model = _resolve_generation_model(db=db, model_override=model_override)
     provider = current_app.config.get("LLM_PROVIDER", "").strip()
     endpoint = current_app.config.get("LLM_ENDPOINT", "").strip()
     api_key = current_app.config.get("LLM_API_KEY", "").strip()
@@ -253,3 +259,37 @@ def _parse_recipe_json(raw_response: str, errors: list[str]) -> Mapping[str, Any
         return None
 
     return payload
+
+
+def get_allowed_models() -> list[str]:
+    raw = str(current_app.config.get("LLM_ALLOWED_MODELS", "")).strip()
+    from_env = [item.strip() for item in raw.split(",") if item.strip()]
+    fallback = str(current_app.config.get("LLM_MODEL", "")).strip()
+
+    models = from_env or ([fallback] if fallback else [])
+    unique_models: list[str] = []
+    for model in models:
+        if model not in unique_models:
+            unique_models.append(model)
+    return unique_models
+
+
+def get_effective_model(db: Database) -> str:
+    allowed_models = get_allowed_models()
+    env_model = str(current_app.config.get("LLM_MODEL", "")).strip()
+    selected = RuntimeSettingsRepository(db).get_selected_model()
+
+    if selected and selected in allowed_models:
+        return selected
+    if env_model and env_model in allowed_models:
+        return env_model
+    if allowed_models:
+        return allowed_models[0]
+    return selected or env_model
+
+
+def _resolve_generation_model(*, db: Database, model_override: str | None) -> str:
+    override = (model_override or "").strip()
+    if override:
+        return override
+    return get_effective_model(db)

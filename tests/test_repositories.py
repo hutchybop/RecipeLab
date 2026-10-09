@@ -7,6 +7,7 @@ from app.repositories import (
     GenerationRunsRepository,
     PreferencesRepository,
     RecipesRepository,
+    RuntimeSettingsRepository,
     SuggestionsRepository,
 )
 
@@ -72,6 +73,12 @@ class RepositoryTests(unittest.TestCase):
         found = repository.get_by_id(run["_id"])
         assert found is not None
         self.assertEqual(found["status"], "succeeded")
+
+    def test_runtime_settings_repository_persists_selected_model(self):
+        repository = RuntimeSettingsRepository(self.db)
+        repository.set_selected_model("gpt-5.4")
+
+        self.assertEqual(repository.get_selected_model(), "gpt-5.4")
 
 
 if __name__ == "__main__":

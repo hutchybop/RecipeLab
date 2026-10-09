@@ -16,6 +16,7 @@ class WebRoutesTests(unittest.TestCase):
         os.environ["MONGO_DB_NAME"] = "RecipeLab_test"
         os.environ["LLM_PROVIDER"] = "openai_compatible"
         os.environ["LLM_MODEL"] = "gpt-5.4"
+        os.environ["LLM_ALLOWED_MODELS"] = "gpt-5.4,deepseek-v4.1-flash"
 
         self.app = create_app()
         self.client = self.app.test_client()
@@ -44,6 +45,23 @@ class WebRoutesTests(unittest.TestCase):
         response = self.client.get("/import")
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Import Raw Recipe", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_settings_page_renders(self, mock_db):
+        mock_db.return_value = self.fake_db
+        response = self.client.get("/settings")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Runtime Settings", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_settings_post_persists_model(self, mock_db):
+        mock_db.return_value = self.fake_db
+        response = self.client.post("/settings", data={"model": "deepseek-v4.1-flash"})
+        self.assertEqual(response.status_code, 302)
+
+        settings_docs = self.fake_db["runtime_settings"].docs
+        self.assertEqual(len(settings_docs), 1)
+        self.assertEqual(settings_docs[0]["value"], "deepseek-v4.1-flash")
 
     @patch("app.blueprints.web.routes.get_mongo_db")
     @patch("app.blueprints.web.routes.generate_recipe_suggestion")
@@ -410,6 +428,28 @@ class WebRoutesTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/recipes/r1", response.location)
         self.assertEqual(self.fake_db["recipes"].docs[0]["title"], "New Title")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_export_recipe_pdf(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["recipes"].docs.append(
+            {
+                "_id": "r1",
+                "title": "PDF Recipe",
+                "meal_type": "main",
+                "source_type": "user",
+                "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                "method": ["Cook rice"],
+                "notes": [],
+                "metadata": {"tags": ["quick"], "servings": "1", "prep_time": "5", "cook_time": "10", "rating": "", "difficulty": ""},
+                "deleted_at": None,
+            }
+        )
+
+        response = self.client.get("/recipes/r1/pdf")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "application/pdf")
+        self.assertTrue(response.data.startswith(b"%PDF-1.4"))
 
     @patch("app.blueprints.web.routes.get_mongo_db")
     def test_delete_recipe_soft_deletes(self, mock_db):

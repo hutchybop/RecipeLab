@@ -1,5 +1,11 @@
-from .generation_service import convert_raw_recipe_to_suggestion, generate_recipe_suggestion
+from .generation_service import (
+    convert_raw_recipe_to_suggestion,
+    generate_recipe_suggestion,
+    get_allowed_models,
+    get_effective_model,
+)
 from .llm_adapter import LLMAdapter, LLMAdapterError
+from .pdf_export_service import pdf_filename_for_recipe, render_recipe_pdf
 from .profile_refinement_service import (
     apply_profile_update_suggestion,
     generate_profile_update_suggestions,
@@ -36,6 +42,8 @@ __all__ = [
     "convert_raw_recipe_to_suggestion",
     "generate_profile_update_suggestions",
     "generate_recipe_suggestion",
+    "get_allowed_models",
+    "get_effective_model",
     "normalize_feedback_event_document",
     "normalize_generation_run_document",
     "normalize_generation_run_status",
@@ -43,5 +51,7 @@ __all__ = [
     "normalize_recipe_document",
     "normalize_recipe_update",
     "normalize_suggestion_document",
+    "pdf_filename_for_recipe",
+    "render_recipe_pdf",
     "reject_profile_update_suggestion",
 ]

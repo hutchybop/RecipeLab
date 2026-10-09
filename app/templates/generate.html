@@ -17,8 +17,9 @@
         </div>
 
         <div class="col-md-8">
-          <label class="form-label" for="model">Model Override (optional)</label>
-          <input class="form-control" id="model" name="model" value="{{ model_override }}" placeholder="e.g. deepseek-v4.1-flash" />
+          <label class="form-label">Current Model</label>
+          <input class="form-control" value="{{ current_model or '-' }}" readonly />
+          <div class="form-text">Change model in <a href="{{ url_for('web.settings_page') }}">Settings</a>.</div>
         </div>
 
         <div class="col-12">

@@ -4,6 +4,7 @@ from .indexes import ensure_all_indexes
 from .preferences_repository import PreferencesRepository
 from .profile_update_suggestions_repository import ProfileUpdateSuggestionsRepository
 from .recipes_repository import RecipesRepository
+from .runtime_settings_repository import RuntimeSettingsRepository
 from .suggestions_repository import SuggestionsRepository
 
 __all__ = [
@@ -12,6 +13,7 @@ __all__ = [
     "PreferencesRepository",
     "ProfileUpdateSuggestionsRepository",
     "RecipesRepository",
+    "RuntimeSettingsRepository",
     "SuggestionsRepository",
     "ensure_all_indexes",
 ]
