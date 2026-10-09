@@ -397,7 +397,7 @@ Update this file at every checkpoint.
 - Phase 0: `complete`
 - Phase 1: `complete`
 - Phase 2: `complete`
-- Phase 3: `not_started`
+- Phase 3: `complete`
 - Phase 4: `not_started`
 - Phase 5: `not_started`
 - Phase 6: `not_started`
@@ -503,6 +503,31 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-08
+
+- Phase: 3 / AI Generation Pipeline
+- Status: `in_progress`
+- What changed:
+  - Added prompt composer service for meal type + profile + manual instructions + hard constraints.
+  - Added LLM adapter service using `.env` provider settings (`LLM_PROVIDER`, `LLM_ENDPOINT`, `LLM_API_KEY`, `LLM_MODEL`).
+  - Added `POST /api/generate` endpoint with request validation and structured responses.
+  - Added generation flow orchestration with generation run logging and suggestion persistence.
+  - Added structured parsing/validation handling to persist `draft` or `draft_invalid` suggestions.
+- Tests run:
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app scripts tests run.py`
+- User validation outcome:
+  - Pending controlled generation quality baseline run.
+- Risks/issues:
+  - Output quality and provider-specific behavior still depend on user-run model configuration and prompt tuning.
+- Decision(s):
+  - Keep adapter provider support focused on `openai_compatible` and `ollama` for initial Phase 3 scope.
+- Next actions:
+  - Run controlled generation set and evaluate quality/constraint adherence.
+  - Promote Phase 3 to `complete` after user validation gate passes.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -511,3 +536,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-08
 - Phase 2 persistence foundation added (schemas, repositories, indexes, tests, and markdown import tooling).
+
+### 2026-10-08
+- Phase 3 generation pipeline implementation started (prompt composer, LLM adapter, `/api/generate`, parsing/validation, suggestion persistence, and run logging).

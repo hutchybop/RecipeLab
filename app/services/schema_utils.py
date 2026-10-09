@@ -25,6 +25,8 @@ def utc_now() -> datetime:
 def _clean_string(value: Any, *, field_name: str, required: bool = False) -> str:
     if value is None:
         value = ""
+    if isinstance(value, (int, float)):
+        value = str(value)
     if not isinstance(value, str):
         raise ValueError(f"{field_name} must be a string")
     cleaned = value.strip()

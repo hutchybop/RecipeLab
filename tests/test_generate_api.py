@@ -1,0 +1,105 @@
+from __future__ import annotations
+
+import json
+import os
+import unittest
+from unittest.mock import patch
+
+from app import create_app
+
+from tests.fakes import FakeDatabase
+
+
+class GenerateApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["SECRET_KEY"] = "test-secret"
+        os.environ["MONGO_URI"] = "mongodb://localhost:27017"
+        os.environ["MONGO_DB_NAME"] = "RecipeLab_test"
+        os.environ["LLM_PROVIDER"] = "openai_compatible"
+        os.environ["LLM_MODEL"] = "test-model"
+
+        self.fake_db = FakeDatabase()
+        self.app = create_app()
+        self.client = self.app.test_client()
+
+    def tearDown(self):
+        self.app.extensions["mongo_client"].close()
+
+    @patch("app.blueprints.api.routes.get_mongo_db")
+    @patch("app.services.generation_service.LLMAdapter.generate_recipe")
+    def test_generate_success_persists_suggestion_and_run(self, mock_generate, mock_get_mongo_db):
+        mock_get_mongo_db.return_value = self.fake_db
+        mock_generate.return_value = json.dumps(
+            {
+                "title": "Spicy Lentil Bowl",
+                "meal_type": "main",
+                "source": "AI Generated",
+                "servings": 2,
+                "prep_time": 10,
+                "cook_time": 30,
+                "rating": 0,
+                "difficulty": 4,
+                "tags": ["spicy", "lentils"],
+                "ingredients": [
+                    {"quantity": "1", "unit": "cup", "ingredient": "red lentils"},
+                    {"quantity": "2", "unit": "tbsp", "ingredient": "olive oil"},
+                ],
+                "method": ["Rinse lentils", "Simmer until tender"],
+                "notes": ["Freezer friendly"],
+            }
+        )
+
+        response = self.client.post(
+            "/api/generate",
+            json={"meal_type": "main", "instructions": "high protein"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "draft")
+        self.assertTrue(payload["validation"]["valid"])
+
+        suggestions = self.fake_db["suggestions"].docs
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]["status"], "draft")
+
+        runs = self.fake_db["generation_runs"].docs
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(runs[0]["status"], "succeeded")
+
+    @patch("app.blueprints.api.routes.get_mongo_db")
+    @patch("app.services.generation_service.LLMAdapter.generate_recipe")
+    def test_generate_invalid_output_returns_draft_invalid(self, mock_generate, mock_get_mongo_db):
+        mock_get_mongo_db.return_value = self.fake_db
+        mock_generate.return_value = "this is not json"
+
+        response = self.client.post(
+            "/api/generate",
+            json={"meal_type": "main", "instructions": "simple"},
+        )
+
+        self.assertEqual(response.status_code, 422)
+        payload = response.get_json()
+        self.assertEqual(payload["status"], "draft_invalid")
+        self.assertFalse(payload["validation"]["valid"])
+        self.assertGreater(len(payload["validation"]["errors"]), 0)
+
+        suggestions = self.fake_db["suggestions"].docs
+        self.assertEqual(len(suggestions), 1)
+        self.assertEqual(suggestions[0]["status"], "draft_invalid")
+
+        runs = self.fake_db["generation_runs"].docs
+        self.assertEqual(len(runs), 1)
+        self.assertEqual(runs[0]["status"], "failed")
+
+    def test_generate_rejects_invalid_meal_type(self):
+        response = self.client.post(
+            "/api/generate",
+            json={"meal_type": "snack", "instructions": "quick"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+
+if __name__ == "__main__":
+    unittest.main()

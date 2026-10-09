@@ -1,3 +1,6 @@
+from .generation_service import generate_recipe_suggestion
+from .llm_adapter import LLMAdapter, LLMAdapterError
+from .prompt_composer import DEFAULT_HARD_CONSTRAINTS, compose_recipe_prompt
 from .schema_utils import (
     FEEDBACK_SIGNALS,
     GENERATION_RUN_STATUSES,
@@ -14,11 +17,16 @@ from .schema_utils import (
 )
 
 __all__ = [
+    "DEFAULT_HARD_CONSTRAINTS",
     "FEEDBACK_SIGNALS",
     "GENERATION_RUN_STATUSES",
+    "LLMAdapter",
+    "LLMAdapterError",
     "MEAL_TYPES",
     "SUGGESTION_STATUSES",
     "TARGET_TYPES",
+    "compose_recipe_prompt",
+    "generate_recipe_suggestion",
     "normalize_feedback_event_document",
     "normalize_generation_run_document",
     "normalize_generation_run_status",
