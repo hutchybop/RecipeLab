@@ -39,6 +39,13 @@ class WebRoutesTests(unittest.TestCase):
         self.assertIn(b"Generate a Recipe", response.data)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_import_page_renders(self, mock_db):
+        mock_db.return_value = self.fake_db
+        response = self.client.get("/import")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Import Raw Recipe", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
     @patch("app.blueprints.web.routes.generate_recipe_suggestion")
     def test_generate_post_redirects_to_suggestion_detail(self, mock_generate, mock_db):
         mock_db.return_value = self.fake_db
@@ -59,6 +66,28 @@ class WebRoutesTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("/suggestions/s1", response.location)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    @patch("app.blueprints.web.routes.convert_raw_recipe_to_suggestion")
+    def test_import_post_redirects_to_suggestion_detail(self, mock_convert, mock_db):
+        mock_db.return_value = self.fake_db
+        mock_convert.return_value = {
+            "ok": True,
+            "status": "draft",
+            "suggestion_id": "s2",
+        }
+
+        response = self.client.post(
+            "/import",
+            data={
+                "meal_type": "main",
+                "raw_recipe_text": "Title\nIngredients\nMethod",
+                "model": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/suggestions/s2", response.location)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
     @patch("app.blueprints.web.routes.generate_recipe_suggestion")
@@ -134,6 +163,131 @@ class WebRoutesTests(unittest.TestCase):
 
         self.assertEqual(len(self.fake_db["recipes"].docs), 1)
         self.assertEqual(self.fake_db["suggestions"].docs[0]["status"], "accepted")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_edit_suggestion_updates_and_sets_draft(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["suggestions"].docs.append(
+            {
+                "_id": "s-edit",
+                "title": "Draft Suggestion",
+                "meal_type": "main",
+                "status": "draft_invalid",
+                "recipe": {
+                    "title": "Draft Suggestion",
+                    "meal_type": "main",
+                    "source_type": "user",
+                    "metadata": {"source": "", "servings": "", "prep_time": "", "cook_time": "", "rating": "", "difficulty": "", "tags": []},
+                    "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                    "method": ["Cook rice"],
+                    "notes": [],
+                },
+                "validation": {"valid": False, "errors": ["bad format"]},
+                "created_at": 1,
+            }
+        )
+
+        response = self.client.post(
+            "/suggestions/s-edit/edit",
+            data={
+                "title": "Edited Suggestion",
+                "meal_type": "main",
+                "source_type": "user",
+                "source": "",
+                "servings": "2",
+                "prep_time": "5",
+                "cook_time": "10",
+                "difficulty": "",
+                "rating": "",
+                "tags": "quick",
+                "ingredients": "1 cup rice",
+                "method": "Cook rice",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/suggestions/s-edit", response.location)
+        self.assertEqual(self.fake_db["suggestions"].docs[0]["status"], "draft")
+        self.assertEqual(self.fake_db["suggestions"].docs[0]["title"], "Edited Suggestion")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_edit_recipe_updates_title(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["recipes"].docs.append(
+            {
+                "_id": "r1",
+                "title": "Old Title",
+                "meal_type": "main",
+                "source_type": "user",
+                "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                "method": ["Cook rice"],
+                "notes": [],
+                "metadata": {
+                    "source": "",
+                    "servings": "1",
+                    "prep_time": "5",
+                    "cook_time": "10",
+                    "rating": "",
+                    "difficulty": "",
+                    "tags": [],
+                },
+                "deleted_at": None,
+            }
+        )
+
+        response = self.client.post(
+            "/recipes/r1/edit",
+            data={
+                "title": "New Title",
+                "meal_type": "main",
+                "source_type": "user",
+                "source": "",
+                "servings": "1",
+                "prep_time": "5",
+                "cook_time": "10",
+                "difficulty": "",
+                "rating": "",
+                "tags": "",
+                "ingredients": "1 cup rice",
+                "method": "Cook rice",
+                "notes": "",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/recipes/r1", response.location)
+        self.assertEqual(self.fake_db["recipes"].docs[0]["title"], "New Title")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_delete_recipe_soft_deletes(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["recipes"].docs.append(
+            {
+                "_id": "r2",
+                "title": "Delete Me",
+                "meal_type": "main",
+                "source_type": "user",
+                "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                "method": ["Cook rice"],
+                "notes": [],
+                "metadata": {
+                    "source": "",
+                    "servings": "1",
+                    "prep_time": "5",
+                    "cook_time": "10",
+                    "rating": "",
+                    "difficulty": "",
+                    "tags": [],
+                },
+                "deleted_at": None,
+            }
+        )
+
+        response = self.client.post("/recipes/r2/delete")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/recipes", response.location)
+        self.assertIsNotNone(self.fake_db["recipes"].docs[0]["deleted_at"])
 
 
 if __name__ == "__main__":

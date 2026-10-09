@@ -48,3 +48,19 @@ class SuggestionsRepository:
             {"$set": {"status": status, "updated_at": utc_now()}},
         )
         return result.modified_count > 0
+
+    def update_recipe_for_review(self, suggestion_id: Any, *, title: str, meal_type: str, recipe: dict[str, Any]) -> bool:
+        result = self.collection.update_one(
+            {"_id": to_object_id(suggestion_id)},
+            {
+                "$set": {
+                    "title": title,
+                    "meal_type": meal_type,
+                    "recipe": recipe,
+                    "validation": {"valid": True, "errors": []},
+                    "status": "draft",
+                    "updated_at": utc_now(),
+                }
+            },
+        )
+        return result.modified_count > 0

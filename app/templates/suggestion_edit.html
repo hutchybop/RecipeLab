@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Suggestion · RecipeLab{% endblock %}
+
+{% block content %}
+  {% set recipe = suggestion.get('recipe', {}) %}
+  {% set metadata = recipe.get('metadata', {}) %}
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h3 mb-3">Edit Suggestion Before Save</h1>
+
+      <form method="post" action="{{ url_for('web.edit_suggestion', suggestion_id=suggestion['_id']) }}" class="row g-3">
+        <div class="col-md-8">
+          <label class="form-label" for="title">Title</label>
+          <input class="form-control" id="title" name="title" value="{{ recipe.get('title', suggestion.get('title', '')) }}" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="meal_type">Meal Type</label>
+          <select class="form-select" id="meal_type" name="meal_type" required>
+            {% for meal_type in meal_types %}
+              <option value="{{ meal_type }}" {% if suggestion.get('meal_type') == meal_type %}selected{% endif %}>{{ meal_type }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label" for="source_type">Source Type</label>
+          <select class="form-select" id="source_type" name="source_type">
+            <option value="user" {% if recipe.get('source_type') == 'user' %}selected{% endif %}>user</option>
+            <option value="ai" {% if recipe.get('source_type') == 'ai' %}selected{% endif %}>ai</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="source">Source</label>
+          <input class="form-control" id="source" name="source" value="{{ metadata.get('source', '') }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="tags">Tags (comma separated)</label>
+          <input class="form-control" id="tags" name="tags" value="{{ metadata.get('tags', [])|join(', ') }}" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label" for="servings">Servings</label>
+          <input class="form-control" id="servings" name="servings" value="{{ metadata.get('servings', '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="prep_time">Prep Time</label>
+          <input class="form-control" id="prep_time" name="prep_time" value="{{ metadata.get('prep_time', '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="cook_time">Cook Time</label>
+          <input class="form-control" id="cook_time" name="cook_time" value="{{ metadata.get('cook_time', '') }}" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="difficulty">Difficulty</label>
+          <input class="form-control" id="difficulty" name="difficulty" value="{{ metadata.get('difficulty', '') }}" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label" for="rating">Rating</label>
+          <input class="form-control" id="rating" name="rating" value="{{ metadata.get('rating', '') }}" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="ingredients">Ingredients (one per line)</label>
+          <textarea class="form-control" id="ingredients" name="ingredients" rows="8" required>{% for item in recipe.get('ingredients', []) %}{{ item.get('quantity', '') }} {{ item.get('unit', '') }} {{ item.get('ingredient', '') }}{% if not loop.last %}
+{% endif %}{% endfor %}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="method">Method (one step per line)</label>
+          <textarea class="form-control" id="method" name="method" rows="8" required>{{ recipe.get('method', [])|join('\n') }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="notes">Notes (one per line, optional)</label>
+          <textarea class="form-control" id="notes" name="notes" rows="4">{{ recipe.get('notes', [])|join('\n') }}</textarea>
+        </div>
+
+        <div class="col-12 d-flex flex-wrap gap-2">
+          <button class="btn btn-primary" type="submit">Save Suggestion Changes</button>
+          <a class="btn btn-success" href="{{ url_for('web.suggestion_detail', suggestion_id=suggestion['_id']) }}">Back to Review</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

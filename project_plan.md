@@ -399,7 +399,7 @@ Update this file at every checkpoint.
 - Phase 2: `complete`
 - Phase 3: `complete`
 - Phase 4: `complete`
-- Phase 5: `not_started`
+- Phase 5: `complete`
 - Phase 6: `not_started`
 - Phase 7: `not_started`
 - Phase 8: `not_started`
@@ -555,6 +555,34 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09
+
+- Phase: 5 / Recipe Lifecycle Features
+- Status: `in_progress`
+- What changed:
+  - Added recipe edit flow (`/recipes/<id>/edit`) with metadata/ingredients/method updates.
+  - Added recipe delete flow (`POST /recipes/<id>/delete`) using soft-delete behavior.
+  - Added raw recipe import UI (`/import`) for AI canonical conversion from unstructured text.
+  - Added conversion service flow that stores converted output as reviewable suggestions (`draft`/`draft_invalid`).
+  - Added edit-before-save flow for suggestions (`/suggestions/<id>/edit`) prior to acceptance.
+  - Updated templates and navigation to expose lifecycle actions clearly.
+  - Added tests for conversion flow, edit/delete behaviors, and import routes.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes tests.test_conversion_service -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending Phase 5 walkthrough and CRUD/import verification.
+- Risks/issues:
+  - Conversion quality still depends on model output quality and may require prompt tuning for edge-format recipes.
+- Decision(s):
+  - Keep imported conversion outputs in suggestion review flow first; do not auto-save converted recipes.
+- Next actions:
+  - Run Phase 5 validation checklist (CRUD + import conversion end-to-end).
+  - Promote Phase 5 to `complete` after user gate checks pass.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -569,3 +597,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 4 core Bootstrap UI implementation started (dashboard, generate, suggestions, recipe library/detail, and web route tests).
+
+### 2026-10-09
+- Phase 5 recipe lifecycle implementation started (edit/delete flows, raw import conversion, and review/edit-before-save flow).

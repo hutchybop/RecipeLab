@@ -1,3 +1,20 @@
+## Session 7
+### Friday October 9th
+<br>
+
+**Summary:** This session started Phase 5 lifecycle features. It introduced recipe edit and soft-delete flows, raw recipe import + AI canonical conversion into suggestions, and an edit-before-save suggestion workflow. Additional tests were added for conversion and lifecycle route behavior.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- implement recipe lifecycle routes - *Added recipe edit/delete and suggestion edit-before-save flows via web routes and templates.*
+- add raw import conversion flow - *Added `/import` UI and conversion service path to transform unstructured recipe text into reviewable suggestions.*
+- add phase 5 tests - *Added conversion service tests and expanded web route tests for edit/delete/import behavior.*
+---
+<br>
+
 ## Session 6
 ### Friday October 9th
 <br>

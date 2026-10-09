@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Import Raw Recipe · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h3 mb-3">Import Raw Recipe</h1>
+      <p class="text-muted">Paste unstructured recipe text. AI will convert it into canonical format for review before saving.</p>
+
+      <form method="post" action="{{ url_for('web.import_recipe_page') }}" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="meal_type">Meal Type</label>
+          <select class="form-select" id="meal_type" name="meal_type" required>
+            {% for meal_type in meal_types %}
+              <option value="{{ meal_type }}" {% if meal_type == selected_meal_type %}selected{% endif %}>{{ meal_type }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-8">
+          <label class="form-label" for="model">Model Override (optional)</label>
+          <input class="form-control" id="model" name="model" value="{{ model_override }}" placeholder="e.g. deepseek-v4.1-flash" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="raw_recipe_text">Raw Recipe Text</label>
+          <textarea class="form-control" id="raw_recipe_text" name="raw_recipe_text" rows="14" placeholder="Paste recipe title, ingredients, and method..." required>{{ raw_recipe_text }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-success" type="submit">Convert for Review</button>
+          <a class="btn btn-outline-secondary" href="{{ url_for('web.suggestions_page') }}">View Suggestions</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

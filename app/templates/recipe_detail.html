@@ -60,5 +60,11 @@
     </div>
   {% endif %}
 
-  <a class="btn btn-outline-secondary" href="{{ url_for('web.recipes_page') }}">Back to Library</a>
+  <div class="d-flex flex-wrap gap-2">
+    <a class="btn btn-outline-primary" href="{{ url_for('web.edit_recipe', recipe_id=recipe['_id']) }}">Edit Recipe</a>
+    <form method="post" action="{{ url_for('web.delete_recipe', recipe_id=recipe['_id']) }}" onsubmit="return confirm('Delete this recipe?');">
+      <button class="btn btn-outline-danger" type="submit">Delete Recipe</button>
+    </form>
+    <a class="btn btn-outline-secondary" href="{{ url_for('web.recipes_page') }}">Back to Library</a>
+  </div>
 {% endblock %}

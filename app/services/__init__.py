@@ -1,4 +1,4 @@
-from .generation_service import generate_recipe_suggestion
+from .generation_service import convert_raw_recipe_to_suggestion, generate_recipe_suggestion
 from .llm_adapter import LLMAdapter, LLMAdapterError
 from .prompt_composer import DEFAULT_HARD_CONSTRAINTS, compose_recipe_prompt
 from .schema_utils import (
@@ -26,6 +26,7 @@ __all__ = [
     "SUGGESTION_STATUSES",
     "TARGET_TYPES",
     "compose_recipe_prompt",
+    "convert_raw_recipe_to_suggestion",
     "generate_recipe_suggestion",
     "normalize_feedback_event_document",
     "normalize_generation_run_document",

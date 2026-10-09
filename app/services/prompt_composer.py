@@ -58,3 +58,33 @@ def compose_recipe_prompt(
         '  "notes": ["string"]\n'
         "}\n"
     )
+
+
+def compose_canonical_conversion_prompt(*, meal_type: str, raw_recipe_text: str) -> str:
+    return (
+        "Convert the raw recipe text into exactly one canonical recipe JSON object. "
+        "Return valid JSON only. No markdown or extra prose.\n\n"
+        f"Meal type to apply: {meal_type}\n\n"
+        "Rules:\n"
+        "- Preserve provided facts; do not invent missing metadata.\n"
+        "- Keep missing values as empty strings or empty lists.\n"
+        "- Normalize ingredients to objects with quantity, unit, ingredient.\n"
+        "- Convert preparation headings into a simple method step list.\n\n"
+        "Output JSON schema:\n"
+        "{\n"
+        '  "title": "string",\n'
+        '  "meal_type": "string",\n'
+        '  "source": "string",\n'
+        '  "servings": "string",\n'
+        '  "prep_time": "string",\n'
+        '  "cook_time": "string",\n'
+        '  "rating": "string",\n'
+        '  "difficulty": "string",\n'
+        '  "tags": ["string"],\n'
+        '  "ingredients": [{"quantity": "string", "unit": "string", "ingredient": "string"}],\n'
+        '  "method": ["string"],\n'
+        '  "notes": ["string"]\n'
+        "}\n\n"
+        "Raw recipe text to convert:\n"
+        f"{raw_recipe_text.strip()}\n"
+    )
