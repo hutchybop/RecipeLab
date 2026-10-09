@@ -745,6 +745,33 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09 (Phase 8 Final Preflight)
+
+- Phase: 8 / Docker Release and GHCR Automation
+- Status: `in_progress`
+- What changed:
+  - Verified `ship/.env_ship.sh` is present with `DOCKER_SERVICE_NAME=recipelab` and `APP_TYPE=py`.
+  - Confirmed server compose template values align with ship + GHCR flow (`ghcr.io/hutchybop/recipelab:latest`, service/container `recipelab`).
+  - Ran Black formatting to align with `ship.sh` Python quality step and avoid surprise formatting changes during deploy.
+  - Added Phase 8 UAT checklist at `docs/checklists/phase-8-uat.md`.
+  - Added release/deploy runbook at `docs/runbook-phase-8-release.md`.
+- Tests run:
+  - `.venv/bin/python -m black --check .`
+  - `.venv/bin/python -m flake8 .`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending first tag-triggered GHCR release and longrunner deploy smoke test.
+- Risks/issues:
+  - Docker CLI is unavailable in this execution environment, so `docker compose config` could not be executed locally here.
+- Decision(s):
+  - Proceed to first tagged release using existing `ship` flow.
+- Next actions:
+  - Run `bash /Users/hutch/Coding/ship/ship.sh` from repo root.
+  - Choose deploy = `y`, create first release tag (`vX.Y.Z`), and verify GHCR + server smoke checks.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -774,3 +801,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 8 readiness update completed: added GHCR release workflow, lint/format config, ship-script compatibility alignment, and naming standardization to `recipelab`.
+
+### 2026-10-09
+- Phase 8 final preflight completed: ship env verified, Black formatting applied, and Phase 8 UAT/runbook docs added.

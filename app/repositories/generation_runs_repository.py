@@ -6,7 +6,11 @@ from pymongo import ASCENDING, DESCENDING
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from ..services.schema_utils import normalize_generation_run_document, normalize_generation_run_status, utc_now
+from ..services.schema_utils import (
+    normalize_generation_run_document,
+    normalize_generation_run_status,
+    utc_now,
+)
 from .common import to_object_id
 
 
@@ -41,7 +45,9 @@ class GenerationRunsRepository:
     def get_by_id(self, run_id: Any) -> dict[str, Any] | None:
         return self.collection.find_one({"_id": to_object_id(run_id)})
 
-    def update_status(self, run_id: Any, status: str, *, raw_response: str = "", error: str = "") -> bool:
+    def update_status(
+        self, run_id: Any, status: str, *, raw_response: str = "", error: str = ""
+    ) -> bool:
         normalized_status = normalize_generation_run_status(status)
         result = self.collection.update_one(
             {"_id": to_object_id(run_id)},

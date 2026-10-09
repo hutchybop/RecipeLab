@@ -62,7 +62,9 @@ class FakeCollection:
         matched = [deepcopy(doc) for doc in self.docs if _matches(doc, filters)]
         return FakeCursor(matched)
 
-    def update_one(self, filters: dict[str, Any], update: dict[str, Any], upsert: bool = False) -> FakeUpdateResult:
+    def update_one(
+        self, filters: dict[str, Any], update: dict[str, Any], upsert: bool = False
+    ) -> FakeUpdateResult:
         for index, doc in enumerate(self.docs):
             if _matches(doc, filters):
                 self.docs[index] = _apply_update(doc, update)
@@ -79,7 +81,9 @@ class FakeCollection:
 
         return FakeUpdateResult(modified_count=0)
 
-    def update_many(self, filters: dict[str, Any], update: dict[str, Any]) -> FakeUpdateResult:
+    def update_many(
+        self, filters: dict[str, Any], update: dict[str, Any]
+    ) -> FakeUpdateResult:
         updated = 0
         for index, doc in enumerate(self.docs):
             if _matches(doc, filters):

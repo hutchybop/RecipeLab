@@ -49,7 +49,9 @@ def generate_recipe():
             db=get_mongo_db(),
             meal_type=meal_type,
             instructions=instructions,
-            model_override=str(model_override).strip() if isinstance(model_override, str) else None,
+            model_override=(
+                str(model_override).strip() if isinstance(model_override, str) else None
+            ),
         )
     except Exception:
         return (

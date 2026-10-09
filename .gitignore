@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+ship/.env_ship.sh
+ship/ship_logs/
 *.pem
 *.key
 

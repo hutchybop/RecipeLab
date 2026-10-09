@@ -46,11 +46,19 @@ class ProfileUpdateSuggestionsRepository:
         return self.collection.find_one({"_id": to_object_id(suggestion_id)})
 
     def list_pending(self, *, limit: int = 100) -> list[dict[str, Any]]:
-        cursor = self.collection.find({"status": "pending"}).sort("created_at", DESCENDING).limit(limit)
+        cursor = (
+            self.collection.find({"status": "pending"})
+            .sort("created_at", DESCENDING)
+            .limit(limit)
+        )
         return list(cursor)
 
     def list_by_status(self, status: str, *, limit: int = 100) -> list[dict[str, Any]]:
-        cursor = self.collection.find({"status": status}).sort("updated_at", DESCENDING).limit(limit)
+        cursor = (
+            self.collection.find({"status": status})
+            .sort("updated_at", DESCENDING)
+            .limit(limit)
+        )
         return list(cursor)
 
     def update_status(self, suggestion_id: Any, status: str) -> bool:

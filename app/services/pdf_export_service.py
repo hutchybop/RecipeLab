@@ -23,7 +23,9 @@ def render_recipe_pdf(recipe: dict[str, Any]) -> bytes:
 
     for item in recipe.get("ingredients", []):
         if isinstance(item, dict):
-            lines.append(f"- {item.get('quantity', '')} {item.get('unit', '')} {item.get('ingredient', '')}".strip())
+            lines.append(
+                f"- {item.get('quantity', '')} {item.get('unit', '')} {item.get('ingredient', '')}".strip()
+            )
 
     lines.append("")
     lines.append("Method:")
@@ -63,7 +65,9 @@ def _build_simple_pdf(lines: list[str]) -> bytes:
         b"2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n",
         b"3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n",
         b"4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n",
-        f"5 0 obj\n<< /Length {len(stream_data)} >>\nstream\n".encode("ascii") + stream_data + b"\nendstream\nendobj\n",
+        f"5 0 obj\n<< /Length {len(stream_data)} >>\nstream\n".encode("ascii")
+        + stream_data
+        + b"\nendstream\nendobj\n",
     ]
 
     output = bytearray(b"%PDF-1.4\n")
@@ -79,7 +83,9 @@ def _build_simple_pdf(lines: list[str]) -> bytes:
         output.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
 
     output.extend(
-        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF\n".encode("ascii")
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF\n".encode(
+            "ascii"
+        )
     )
     return bytes(output)
 

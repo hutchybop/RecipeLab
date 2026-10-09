@@ -11,7 +11,11 @@ from .profile_refinement_service import (
     generate_profile_update_suggestions,
     reject_profile_update_suggestion,
 )
-from .prompt_composer import DEFAULT_HARD_CONSTRAINTS, compose_canonical_conversion_prompt, compose_recipe_prompt
+from .prompt_composer import (
+    DEFAULT_HARD_CONSTRAINTS,
+    compose_canonical_conversion_prompt,
+    compose_recipe_prompt,
+)
 from .schema_utils import (
     FEEDBACK_SIGNALS,
     GENERATION_RUN_STATUSES,

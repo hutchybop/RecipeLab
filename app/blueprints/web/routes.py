@@ -1,6 +1,15 @@
 from __future__ import annotations
 
-from flask import Blueprint, Response, current_app, flash, redirect, render_template, request, url_for
+from flask import (
+    Blueprint,
+    Response,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 
 from ...extensions import get_mongo_db
 from ...repositories import (
@@ -80,11 +89,19 @@ def generate_page() -> str:
             return redirect(url_for("web.generate_page"))
 
         if result.get("status") == "draft":
-            flash("Recipe suggestion generated. Review and save it to your library.", "success")
+            flash(
+                "Recipe suggestion generated. Review and save it to your library.",
+                "success",
+            )
         else:
-            flash("Suggestion generated but marked draft_invalid. Review details before saving.", "warning")
+            flash(
+                "Suggestion generated but marked draft_invalid. Review details before saving.",
+                "warning",
+            )
 
-        return redirect(url_for("web.suggestion_detail", suggestion_id=result["suggestion_id"]))
+        return redirect(
+            url_for("web.suggestion_detail", suggestion_id=result["suggestion_id"])
+        )
 
     return render_template(
         "generate.html",
@@ -104,11 +121,15 @@ def suggestions_page() -> str:
         suggestions = []
         for value in ["draft", "draft_invalid", "accepted", "rejected"]:
             suggestions.extend(repo.list_by_status(value, limit=200))
-        suggestions = sorted(suggestions, key=lambda item: item.get("created_at"), reverse=True)
+        suggestions = sorted(
+            suggestions, key=lambda item: item.get("created_at"), reverse=True
+        )
     else:
         suggestions = repo.list_by_status(status, limit=200)
 
-    return render_template("suggestions.html", suggestions=suggestions, selected_status=status)
+    return render_template(
+        "suggestions.html", suggestions=suggestions, selected_status=status
+    )
 
 
 @web_bp.get("/suggestions/<suggestion_id>")
@@ -120,7 +141,9 @@ def suggestion_detail(suggestion_id: str) -> str:
         return redirect(url_for("web.suggestions_page"))
 
     feedback_repo = FeedbackEventsRepository(db)
-    feedback_history = feedback_repo.list_for_target(target_type="suggestion", target_id=suggestion_id, limit=20)
+    feedback_history = feedback_repo.list_for_target(
+        target_type="suggestion", target_id=suggestion_id, limit=20
+    )
     feedback_state = _feedback_state_from_events(feedback_history)
     return render_template(
         "suggestion_detail.html",
@@ -143,20 +166,39 @@ def edit_suggestion(suggestion_id: str):
         return redirect(url_for("web.suggestion_detail", suggestion_id=suggestion_id))
 
     if request.method == "POST":
-        meal_type = str(request.form.get("meal_type", suggestion.get("meal_type", "main"))).strip()
+        meal_type = str(
+            request.form.get("meal_type", suggestion.get("meal_type", "main"))
+        ).strip()
         if meal_type not in MEAL_TYPES:
             flash("Please select a valid meal type.", "danger")
             return redirect(url_for("web.edit_suggestion", suggestion_id=suggestion_id))
 
-        tags = [item.strip() for item in str(request.form.get("tags", "")).split(",") if item.strip()]
-        method = [item.strip() for item in str(request.form.get("method", "")).splitlines() if item.strip()]
-        notes = [item.strip() for item in str(request.form.get("notes", "")).splitlines() if item.strip()]
-        ingredients_lines = [item.strip() for item in str(request.form.get("ingredients", "")).splitlines() if item.strip()]
+        tags = [
+            item.strip()
+            for item in str(request.form.get("tags", "")).split(",")
+            if item.strip()
+        ]
+        method = [
+            item.strip()
+            for item in str(request.form.get("method", "")).splitlines()
+            if item.strip()
+        ]
+        notes = [
+            item.strip()
+            for item in str(request.form.get("notes", "")).splitlines()
+            if item.strip()
+        ]
+        ingredients_lines = [
+            item.strip()
+            for item in str(request.form.get("ingredients", "")).splitlines()
+            if item.strip()
+        ]
 
         recipe_payload = {
             "title": str(request.form.get("title", "")).strip(),
             "meal_type": meal_type,
-            "source_type": str(request.form.get("source_type", "user")).strip() or "user",
+            "source_type": str(request.form.get("source_type", "user")).strip()
+            or "user",
             "source": str(request.form.get("source", "")).strip(),
             "servings": str(request.form.get("servings", "")).strip(),
             "prep_time": str(request.form.get("prep_time", "")).strip(),
@@ -187,7 +229,9 @@ def edit_suggestion(suggestion_id: str):
             flash("No changes were saved.", "warning")
         return redirect(url_for("web.suggestion_detail", suggestion_id=suggestion_id))
 
-    return render_template("suggestion_edit.html", suggestion=suggestion, meal_types=sorted(MEAL_TYPES))
+    return render_template(
+        "suggestion_edit.html", suggestion=suggestion, meal_types=sorted(MEAL_TYPES)
+    )
 
 
 @web_bp.post("/suggestions/<suggestion_id>/accept")
@@ -212,7 +256,9 @@ def accept_suggestion(suggestion_id: str):
         recipe = recipes_repo.create(
             {
                 "title": payload.get("title", suggestion.get("title", "Untitled")),
-                "meal_type": payload.get("meal_type", suggestion.get("meal_type", "main")),
+                "meal_type": payload.get(
+                    "meal_type", suggestion.get("meal_type", "main")
+                ),
                 "source_type": payload.get("source_type", "ai"),
                 "source": metadata.get("source", "AI Generated"),
                 "servings": metadata.get("servings", ""),
@@ -227,7 +273,10 @@ def accept_suggestion(suggestion_id: str):
             }
         )
     except Exception:
-        flash("Could not save this suggestion due to a database constraint. Please try again.", "danger")
+        flash(
+            "Could not save this suggestion due to a database constraint. Please try again.",
+            "danger",
+        )
         return redirect(url_for("web.suggestion_detail", suggestion_id=suggestion_id))
 
     suggestions_repo.update_status(suggestion_id, "accepted")
@@ -237,7 +286,9 @@ def accept_suggestion(suggestion_id: str):
 
 @web_bp.post("/suggestions/<suggestion_id>/reject")
 def reject_suggestion(suggestion_id: str):
-    updated = SuggestionsRepository(get_mongo_db()).update_status(suggestion_id, "rejected")
+    updated = SuggestionsRepository(get_mongo_db()).update_status(
+        suggestion_id, "rejected"
+    )
     if updated:
         flash("Suggestion rejected.", "info")
     else:
@@ -252,7 +303,9 @@ def recipes_page() -> str:
         selected_meal_type = ""
         flash("Invalid meal type filter ignored.", "warning")
 
-    recipes = RecipesRepository(get_mongo_db()).list(meal_type=selected_meal_type or None, limit=300)
+    recipes = RecipesRepository(get_mongo_db()).list(
+        meal_type=selected_meal_type or None, limit=300
+    )
     return render_template(
         "recipes.html",
         recipes=recipes,
@@ -297,11 +350,18 @@ def import_recipe_page() -> str:
             return redirect(url_for("web.import_recipe_page"))
 
         if result.get("status") == "draft":
-            flash("Raw recipe converted. Review and save it to your library.", "success")
+            flash(
+                "Raw recipe converted. Review and save it to your library.", "success"
+            )
         else:
-            flash("Converted output failed validation. Review and edit before saving.", "warning")
+            flash(
+                "Converted output failed validation. Review and edit before saving.",
+                "warning",
+            )
 
-        return redirect(url_for("web.suggestion_detail", suggestion_id=result["suggestion_id"]))
+        return redirect(
+            url_for("web.suggestion_detail", suggestion_id=result["suggestion_id"])
+        )
 
     return render_template(
         "import_recipe.html",
@@ -349,7 +409,9 @@ def recipe_detail(recipe_id: str) -> str:
         return redirect(url_for("web.recipes_page"))
 
     feedback_repo = FeedbackEventsRepository(db)
-    feedback_history = feedback_repo.list_for_target(target_type="recipe", target_id=recipe_id, limit=20)
+    feedback_history = feedback_repo.list_for_target(
+        target_type="recipe", target_id=recipe_id, limit=20
+    )
     feedback_state = _feedback_state_from_events(feedback_history)
 
     return render_template(
@@ -424,10 +486,29 @@ def profile_page() -> str:
         action = str(request.form.get("action", "save_profile")).strip()
 
         if action == "save_profile":
-            profile_name = str(request.form.get("profile_name", active_profile.get("profile_name", "default"))).strip() or "default"
-            hard_avoids = [item.strip() for item in str(request.form.get("hard_avoids", "")).splitlines() if item.strip()]
-            likes = [item.strip() for item in str(request.form.get("likes", "")).splitlines() if item.strip()]
-            dislikes = [item.strip() for item in str(request.form.get("dislikes", "")).splitlines() if item.strip()]
+            profile_name = (
+                str(
+                    request.form.get(
+                        "profile_name", active_profile.get("profile_name", "default")
+                    )
+                ).strip()
+                or "default"
+            )
+            hard_avoids = [
+                item.strip()
+                for item in str(request.form.get("hard_avoids", "")).splitlines()
+                if item.strip()
+            ]
+            likes = [
+                item.strip()
+                for item in str(request.form.get("likes", "")).splitlines()
+                if item.strip()
+            ]
+            dislikes = [
+                item.strip()
+                for item in str(request.form.get("dislikes", "")).splitlines()
+                if item.strip()
+            ]
             notes = str(request.form.get("notes", "")).strip()
 
             preferences_repo.upsert_profile(
@@ -446,7 +527,9 @@ def profile_page() -> str:
 
         if action == "refresh_suggestions":
             result = generate_profile_update_suggestions(db)
-            flash(f"Generated {result['created']} profile update suggestion(s).", "info")
+            flash(
+                f"Generated {result['created']} profile update suggestion(s).", "info"
+            )
             return redirect(url_for("web.profile_page"))
 
     pending_updates = updates_repo.list_pending(limit=200)
@@ -472,7 +555,10 @@ def apply_profile_suggestion(suggestion_id: str):
 @web_bp.post("/profile/suggestions/<suggestion_id>/reject")
 def reject_profile_suggestion(suggestion_id: str):
     updated = reject_profile_update_suggestion(get_mongo_db(), suggestion_id)
-    flash("Suggestion rejected." if updated else "Suggestion not found.", "info" if updated else "warning")
+    flash(
+        "Suggestion rejected." if updated else "Suggestion not found.",
+        "info" if updated else "warning",
+    )
     return redirect(url_for("web.profile_page"))
 
 
@@ -485,21 +571,42 @@ def edit_recipe(recipe_id: str):
         return redirect(url_for("web.recipes_page"))
 
     if request.method == "POST":
-        meal_type = str(request.form.get("meal_type", recipe.get("meal_type", "main"))).strip()
+        meal_type = str(
+            request.form.get("meal_type", recipe.get("meal_type", "main"))
+        ).strip()
         if meal_type not in MEAL_TYPES:
             flash("Please select a valid meal type.", "danger")
             return redirect(url_for("web.edit_recipe", recipe_id=recipe_id))
 
-        tags = [item.strip() for item in str(request.form.get("tags", "")).split(",") if item.strip()]
-        method = [item.strip() for item in str(request.form.get("method", "")).splitlines() if item.strip()]
-        notes = [item.strip() for item in str(request.form.get("notes", "")).splitlines() if item.strip()]
+        tags = [
+            item.strip()
+            for item in str(request.form.get("tags", "")).split(",")
+            if item.strip()
+        ]
+        method = [
+            item.strip()
+            for item in str(request.form.get("method", "")).splitlines()
+            if item.strip()
+        ]
+        notes = [
+            item.strip()
+            for item in str(request.form.get("notes", "")).splitlines()
+            if item.strip()
+        ]
 
-        ingredients_lines = [item.strip() for item in str(request.form.get("ingredients", "")).splitlines() if item.strip()]
+        ingredients_lines = [
+            item.strip()
+            for item in str(request.form.get("ingredients", "")).splitlines()
+            if item.strip()
+        ]
 
         update_fields = {
             "title": str(request.form.get("title", "")).strip(),
             "meal_type": meal_type,
-            "source_type": str(request.form.get("source_type", recipe.get("source_type", "user"))).strip() or "user",
+            "source_type": str(
+                request.form.get("source_type", recipe.get("source_type", "user"))
+            ).strip()
+            or "user",
             "ingredients": ingredients_lines,
             "method": method,
             "notes": notes,
@@ -524,7 +631,9 @@ def edit_recipe(recipe_id: str):
             flash("No changes were saved.", "warning")
         return redirect(url_for("web.recipe_detail", recipe_id=recipe_id))
 
-    return render_template("recipe_edit.html", recipe=recipe, meal_types=sorted(MEAL_TYPES))
+    return render_template(
+        "recipe_edit.html", recipe=recipe, meal_types=sorted(MEAL_TYPES)
+    )
 
 
 @web_bp.post("/recipes/<recipe_id>/delete")

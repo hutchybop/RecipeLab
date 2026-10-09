@@ -69,7 +69,9 @@ class LLMAdapter:
 
     def _openai_generate(self, prompt: str) -> str:
         if not self.model:
-            raise LLMAdapterError("LLM_MODEL is required for openai_compatible provider")
+            raise LLMAdapterError(
+                "LLM_MODEL is required for openai_compatible provider"
+            )
 
         client = self._get_openai_client()
         if self._uses_responses_api(self.model):
@@ -167,7 +169,14 @@ class LLMAdapter:
             response_path=("response",),
         )
 
-    def _post_json(self, *, endpoint: str, headers: dict[str, str], payload: dict, response_path: tuple) -> str:
+    def _post_json(
+        self,
+        *,
+        endpoint: str,
+        headers: dict[str, str],
+        payload: dict,
+        response_path: tuple,
+    ) -> str:
         data = json.dumps(payload).encode("utf-8")
         req = request.Request(endpoint, data=data, headers=headers, method="POST")
         try:

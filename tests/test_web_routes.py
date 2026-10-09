@@ -181,8 +181,22 @@ class WebRoutesTests(unittest.TestCase):
         )
         self.fake_db["profile_update_suggestions"].docs.extend(
             [
-                {"_id": "u1", "action": "add_like", "token": "chicken", "support_count": 3, "status": "applied", "updated_at": 2},
-                {"_id": "u2", "action": "add_dislike", "token": "cilantro", "support_count": 2, "status": "rejected", "updated_at": 1},
+                {
+                    "_id": "u1",
+                    "action": "add_like",
+                    "token": "chicken",
+                    "support_count": 3,
+                    "status": "applied",
+                    "updated_at": 2,
+                },
+                {
+                    "_id": "u2",
+                    "action": "add_dislike",
+                    "token": "cilantro",
+                    "support_count": 2,
+                    "status": "rejected",
+                    "updated_at": 1,
+                },
             ]
         )
 
@@ -211,8 +225,22 @@ class WebRoutesTests(unittest.TestCase):
         )
         self.fake_db["feedback_events"].docs.extend(
             [
-                {"_id": "f2", "target_type": "recipe", "target_id": "r1", "signal": "note", "notes": "Great texture", "created_at": 2},
-                {"_id": "f1", "target_type": "recipe", "target_id": "r1", "signal": "liked", "notes": "", "created_at": 1},
+                {
+                    "_id": "f2",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "note",
+                    "notes": "Great texture",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f1",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "notes": "",
+                    "created_at": 1,
+                },
             ]
         )
 
@@ -239,8 +267,22 @@ class WebRoutesTests(unittest.TestCase):
         )
         self.fake_db["feedback_events"].docs.extend(
             [
-                {"_id": "f2", "target_type": "suggestion", "target_id": "s1", "signal": "disliked", "notes": "", "created_at": 2},
-                {"_id": "f1", "target_type": "suggestion", "target_id": "s1", "signal": "note", "notes": "Too salty", "created_at": 1},
+                {
+                    "_id": "f2",
+                    "target_type": "suggestion",
+                    "target_id": "s1",
+                    "signal": "disliked",
+                    "notes": "",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f1",
+                    "target_type": "suggestion",
+                    "target_id": "s1",
+                    "signal": "note",
+                    "notes": "Too salty",
+                    "created_at": 1,
+                },
             ]
         )
 
@@ -318,7 +360,9 @@ class WebRoutesTests(unittest.TestCase):
                         "difficulty": "",
                         "tags": ["quick"],
                     },
-                    "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                    "ingredients": [
+                        {"quantity": "1", "unit": "cup", "ingredient": "rice"}
+                    ],
                     "method": ["Cook rice"],
                     "notes": [],
                 },
@@ -347,8 +391,18 @@ class WebRoutesTests(unittest.TestCase):
                     "title": "Draft Suggestion",
                     "meal_type": "main",
                     "source_type": "user",
-                    "metadata": {"source": "", "servings": "", "prep_time": "", "cook_time": "", "rating": "", "difficulty": "", "tags": []},
-                    "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                    "metadata": {
+                        "source": "",
+                        "servings": "",
+                        "prep_time": "",
+                        "cook_time": "",
+                        "rating": "",
+                        "difficulty": "",
+                        "tags": [],
+                    },
+                    "ingredients": [
+                        {"quantity": "1", "unit": "cup", "ingredient": "rice"}
+                    ],
                     "method": ["Cook rice"],
                     "notes": [],
                 },
@@ -379,7 +433,9 @@ class WebRoutesTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/suggestions/s-edit", response.location)
         self.assertEqual(self.fake_db["suggestions"].docs[0]["status"], "draft")
-        self.assertEqual(self.fake_db["suggestions"].docs[0]["title"], "Edited Suggestion")
+        self.assertEqual(
+            self.fake_db["suggestions"].docs[0]["title"], "Edited Suggestion"
+        )
 
     @patch("app.blueprints.web.routes.get_mongo_db")
     def test_edit_recipe_updates_title(self, mock_db):
@@ -441,7 +497,14 @@ class WebRoutesTests(unittest.TestCase):
                 "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
                 "method": ["Cook rice"],
                 "notes": [],
-                "metadata": {"tags": ["quick"], "servings": "1", "prep_time": "5", "cook_time": "10", "rating": "", "difficulty": ""},
+                "metadata": {
+                    "tags": ["quick"],
+                    "servings": "1",
+                    "prep_time": "5",
+                    "cook_time": "10",
+                    "rating": "",
+                    "difficulty": "",
+                },
                 "deleted_at": None,
             }
         )

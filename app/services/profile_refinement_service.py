@@ -30,7 +30,9 @@ _STOPWORDS = {
 }
 
 
-def generate_profile_update_suggestions(db: Database, *, min_support: int = 2, limit: int = 300) -> dict[str, Any]:
+def generate_profile_update_suggestions(
+    db: Database, *, min_support: int = 2, limit: int = 300
+) -> dict[str, Any]:
     feedback_repo = FeedbackEventsRepository(db)
     preferences_repo = PreferencesRepository(db)
     profile_updates_repo = ProfileUpdateSuggestionsRepository(db)
@@ -70,7 +72,10 @@ def generate_profile_update_suggestions(db: Database, *, min_support: int = 2, l
         else:
             disliked_counts.update(tokens)
 
-    existing_pending = {(item.get("action"), item.get("token")) for item in profile_updates_repo.list_pending(limit=500)}
+    existing_pending = {
+        (item.get("action"), item.get("token"))
+        for item in profile_updates_repo.list_pending(limit=500)
+    }
     likes = {str(item).lower() for item in active_profile.get("likes", [])}
     dislikes = {str(item).lower() for item in active_profile.get("dislikes", [])}
     hard_avoids = {str(item).lower() for item in active_profile.get("hard_avoids", [])}
@@ -116,10 +121,15 @@ def generate_profile_update_suggestions(db: Database, *, min_support: int = 2, l
         existing_pending.add(key)
         created += 1
 
-    return {"created": created, "pending_total": len(profile_updates_repo.list_pending(limit=500))}
+    return {
+        "created": created,
+        "pending_total": len(profile_updates_repo.list_pending(limit=500)),
+    }
 
 
-def apply_profile_update_suggestion(db: Database, suggestion_id: str) -> tuple[bool, str]:
+def apply_profile_update_suggestion(
+    db: Database, suggestion_id: str
+) -> tuple[bool, str]:
     profile_updates_repo = ProfileUpdateSuggestionsRepository(db)
     preferences_repo = PreferencesRepository(db)
 
@@ -141,14 +151,26 @@ def apply_profile_update_suggestion(db: Database, suggestion_id: str) -> tuple[b
     token = str(suggestion.get("token", "")).strip().lower()
     action = suggestion.get("action")
 
-    likes = [str(item).strip() for item in profile.get("likes", []) if str(item).strip()]
-    dislikes = [str(item).strip() for item in profile.get("dislikes", []) if str(item).strip()]
-    hard_avoids = [str(item).strip() for item in profile.get("hard_avoids", []) if str(item).strip()]
+    likes = [
+        str(item).strip() for item in profile.get("likes", []) if str(item).strip()
+    ]
+    dislikes = [
+        str(item).strip() for item in profile.get("dislikes", []) if str(item).strip()
+    ]
+    hard_avoids = [
+        str(item).strip()
+        for item in profile.get("hard_avoids", [])
+        if str(item).strip()
+    ]
 
     if action == "add_like" and token and token not in {item.lower() for item in likes}:
         likes.append(token)
         dislikes = [item for item in dislikes if item.lower() != token]
-    elif action == "add_dislike" and token and token not in {item.lower() for item in hard_avoids}:
+    elif (
+        action == "add_dislike"
+        and token
+        and token not in {item.lower() for item in hard_avoids}
+    ):
         dislikes.append(token)
         likes = [item for item in likes if item.lower() != token]
     else:
@@ -170,10 +192,17 @@ def apply_profile_update_suggestion(db: Database, suggestion_id: str) -> tuple[b
 
 
 def reject_profile_update_suggestion(db: Database, suggestion_id: str) -> bool:
-    return ProfileUpdateSuggestionsRepository(db).update_status(suggestion_id, "rejected")
+    return ProfileUpdateSuggestionsRepository(db).update_status(
+        suggestion_id, "rejected"
+    )
 
 
-def _resolve_target_recipe(*, event: dict[str, Any], recipes_repo: RecipesRepository, suggestions_repo: SuggestionsRepository) -> dict[str, Any] | None:
+def _resolve_target_recipe(
+    *,
+    event: dict[str, Any],
+    recipes_repo: RecipesRepository,
+    suggestions_repo: SuggestionsRepository,
+) -> dict[str, Any] | None:
     target_type = event.get("target_type")
     target_id = event.get("target_id")
     if not target_id:

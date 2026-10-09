@@ -41,11 +41,15 @@ class SchemaUtilsTests(unittest.TestCase):
             )
 
     def test_normalize_suggestion_document_defaults_status(self):
-        suggestion = normalize_suggestion_document({"title": "S1", "meal_type": "dessert"})
+        suggestion = normalize_suggestion_document(
+            {"title": "S1", "meal_type": "dessert"}
+        )
         self.assertEqual(suggestion["status"], "draft")
 
     def test_normalize_preference_document(self):
-        profile = normalize_preference_document({"profile_name": "default", "hard_avoids": ["peanuts"]})
+        profile = normalize_preference_document(
+            {"profile_name": "default", "hard_avoids": ["peanuts"]}
+        )
         self.assertTrue(profile["active"])
         self.assertEqual(profile["hard_avoids"], ["peanuts"])
 
@@ -61,7 +65,9 @@ class SchemaUtilsTests(unittest.TestCase):
         self.assertEqual(event["signal"], "liked")
 
     def test_normalize_generation_run_document(self):
-        run = normalize_generation_run_document({"meal_type": "main", "model": "gpt-test"})
+        run = normalize_generation_run_document(
+            {"meal_type": "main", "model": "gpt-test"}
+        )
         self.assertEqual(run["status"], "started")
 
 

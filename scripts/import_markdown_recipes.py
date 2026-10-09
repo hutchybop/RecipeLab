@@ -18,8 +18,14 @@ from app.repositories import RecipesRepository, ensure_all_indexes
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Import markdown recipes into MongoDB")
-    parser.add_argument("--recipes-dir", default="recipes", help="Path to markdown recipes directory")
-    parser.add_argument("--dry-run", action="store_true", help="Parse and validate without writing to MongoDB")
+    parser.add_argument(
+        "--recipes-dir", default="recipes", help="Path to markdown recipes directory"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Parse and validate without writing to MongoDB",
+    )
     return parser.parse_args()
 
 
@@ -93,7 +99,10 @@ def infer_meal_type(recipe_file: Path) -> str:
     normalized = recipe_file.as_posix().lower()
     if "/recipes/main/" in normalized or "/recipes/ai-suggested/main/" in normalized:
         return "main"
-    if "/recipes/lunch/weekday (batch)/" in normalized or "/recipes/ai-suggested/lunch-batch/" in normalized:
+    if (
+        "/recipes/lunch/weekday (batch)/" in normalized
+        or "/recipes/ai-suggested/lunch-batch/" in normalized
+    ):
         return "lunch_batch"
     if "/recipes/lunch/weekend/" in normalized:
         return "lunch_single"
@@ -103,7 +112,9 @@ def infer_meal_type(recipe_file: Path) -> str:
 
 
 def infer_source_type(recipe_file: Path) -> str:
-    return "ai" if "/recipes/ai-suggested/" in recipe_file.as_posix().lower() else "user"
+    return (
+        "ai" if "/recipes/ai-suggested/" in recipe_file.as_posix().lower() else "user"
+    )
 
 
 def main() -> int:
@@ -134,7 +145,9 @@ def main() -> int:
         source_path = str(recipe_file.relative_to(Path.cwd()))
 
         if repository is not None:
-            repository.upsert_by_source_path(source_path=source_path, document=recipe_payload)
+            repository.upsert_by_source_path(
+                source_path=source_path, document=recipe_payload
+            )
 
         imported_count += 1
 

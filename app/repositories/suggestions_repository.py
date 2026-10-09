@@ -27,7 +27,9 @@ class SuggestionsRepository:
             [("meal_type", ASCENDING), ("created_at", DESCENDING)],
             name="suggestions_meal_type_created_at",
         )
-        collection.create_index([("generation_run_id", ASCENDING)], name="suggestions_generation_run_id")
+        collection.create_index(
+            [("generation_run_id", ASCENDING)], name="suggestions_generation_run_id"
+        )
 
     def create(self, document: Mapping[str, Any]) -> dict[str, Any]:
         normalized = normalize_suggestion_document(document)
@@ -39,7 +41,11 @@ class SuggestionsRepository:
         return self.collection.find_one({"_id": to_object_id(suggestion_id)})
 
     def list_by_status(self, status: str, *, limit: int = 100) -> list[dict[str, Any]]:
-        cursor = self.collection.find({"status": status}).sort("created_at", DESCENDING).limit(limit)
+        cursor = (
+            self.collection.find({"status": status})
+            .sort("created_at", DESCENDING)
+            .limit(limit)
+        )
         return list(cursor)
 
     def update_status(self, suggestion_id: Any, status: str) -> bool:
@@ -49,7 +55,9 @@ class SuggestionsRepository:
         )
         return result.modified_count > 0
 
-    def update_recipe_for_review(self, suggestion_id: Any, *, title: str, meal_type: str, recipe: dict[str, Any]) -> bool:
+    def update_recipe_for_review(
+        self, suggestion_id: Any, *, title: str, meal_type: str, recipe: dict[str, Any]
+    ) -> bool:
         result = self.collection.update_one(
             {"_id": to_object_id(suggestion_id)},
             {

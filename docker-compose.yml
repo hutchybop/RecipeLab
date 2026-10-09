@@ -3,7 +3,7 @@ services:
     build: .
     image: recipelab:local
     ports:
-      - "5000:5000"
+      - "3009:3009"
     env_file:
       - .env
     restart: unless-stopped

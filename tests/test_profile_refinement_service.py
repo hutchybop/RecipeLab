@@ -41,8 +41,20 @@ class ProfileRefinementServiceTests(unittest.TestCase):
         )
         self.db["feedback_events"].docs.extend(
             [
-                {"_id": "f1", "target_type": "recipe", "target_id": "r1", "signal": "liked", "created_at": 2},
-                {"_id": "f2", "target_type": "recipe", "target_id": "r1", "signal": "liked", "created_at": 1},
+                {
+                    "_id": "f1",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f2",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "created_at": 1,
+                },
             ]
         )
 
@@ -64,8 +76,13 @@ class ProfileRefinementServiceTests(unittest.TestCase):
 
         ok, _ = apply_profile_update_suggestion(self.db, "u1")
         self.assertTrue(ok)
-        self.assertIn("chicken", [item.lower() for item in self.db["preferences"].docs[0]["likes"]])
-        self.assertEqual(self.db["profile_update_suggestions"].docs[0]["status"], "applied")
+        self.assertIn(
+            "chicken",
+            [item.lower() for item in self.db["preferences"].docs[0]["likes"]],
+        )
+        self.assertEqual(
+            self.db["profile_update_suggestions"].docs[0]["status"], "applied"
+        )
 
         self.db["profile_update_suggestions"].docs.append(
             {
@@ -79,7 +96,9 @@ class ProfileRefinementServiceTests(unittest.TestCase):
         )
         rejected = reject_profile_update_suggestion(self.db, "u2")
         self.assertTrue(rejected)
-        self.assertEqual(self.db["profile_update_suggestions"].docs[1]["status"], "rejected")
+        self.assertEqual(
+            self.db["profile_update_suggestions"].docs[1]["status"], "rejected"
+        )
 
 
 if __name__ == "__main__":

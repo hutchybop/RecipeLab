@@ -90,8 +90,12 @@ def _normalize_ingredients(value: Any) -> list[dict[str, str]]:
             parsed = _parse_ingredient_line(item)
         elif isinstance(item, Mapping):
             parsed = {
-                "quantity": _clean_string(item.get("quantity", ""), field_name="ingredients.quantity"),
-                "unit": _clean_string(item.get("unit", ""), field_name="ingredients.unit"),
+                "quantity": _clean_string(
+                    item.get("quantity", ""), field_name="ingredients.quantity"
+                ),
+                "unit": _clean_string(
+                    item.get("unit", ""), field_name="ingredients.unit"
+                ),
                 "ingredient": _clean_string(
                     item.get("ingredient", ""),
                     field_name="ingredients.ingredient",
@@ -128,13 +132,20 @@ def normalize_recipe_document(document: Mapping[str, Any]) -> dict[str, Any]:
     normalized = {
         "title": _clean_string(payload.get("title"), field_name="title", required=True),
         "meal_type": _normalize_meal_type(payload.get("meal_type")),
-        "source_type": _clean_string(payload.get("source_type", "user"), field_name="source_type", required=True),
-        "source_path": _clean_string(payload.get("source_path", ""), field_name="source_path"),
+        "source_type": _clean_string(
+            payload.get("source_type", "user"), field_name="source_type", required=True
+        ),
+        "source_path": _clean_string(
+            payload.get("source_path", ""), field_name="source_path"
+        ),
         "ingredients": _normalize_ingredients(payload.get("ingredients", [])),
         "method": _normalize_method_steps(payload.get("method", [])),
         "notes": _string_list(payload.get("notes", []), field_name="notes"),
         "metadata": {
-            "source": _clean_string(payload.get("source", metadata.get("source", "")), field_name="metadata.source"),
+            "source": _clean_string(
+                payload.get("source", metadata.get("source", "")),
+                field_name="metadata.source",
+            ),
             "servings": _clean_string(
                 payload.get("servings", metadata.get("servings", "")),
                 field_name="metadata.servings",
@@ -215,7 +226,15 @@ def normalize_recipe_update(update_fields: Mapping[str, Any]) -> dict[str, Any]:
     normalized_update: dict[str, Any] = {"updated_at": utc_now()}
 
     for key in update_fields:
-        if key in {"source", "servings", "prep_time", "cook_time", "rating", "difficulty", "tags"}:
+        if key in {
+            "source",
+            "servings",
+            "prep_time",
+            "cook_time",
+            "rating",
+            "difficulty",
+            "tags",
+        }:
             normalized_update.setdefault("metadata", {})
             normalized_update["metadata"][key] = normalized["metadata"][key]
         else:
@@ -226,15 +245,23 @@ def normalize_recipe_update(update_fields: Mapping[str, Any]) -> dict[str, Any]:
 
 def normalize_suggestion_document(document: Mapping[str, Any]) -> dict[str, Any]:
     payload = deepcopy(dict(document))
-    status = _clean_string(payload.get("status", "draft"), field_name="status", required=True)
+    status = _clean_string(
+        payload.get("status", "draft"), field_name="status", required=True
+    )
     if status not in SUGGESTION_STATUSES:
         raise ValueError(f"status must be one of {sorted(SUGGESTION_STATUSES)}")
 
     normalized = {
-        "title": _clean_string(payload.get("title", "Untitled suggestion"), field_name="title", required=True),
+        "title": _clean_string(
+            payload.get("title", "Untitled suggestion"),
+            field_name="title",
+            required=True,
+        ),
         "meal_type": _normalize_meal_type(payload.get("meal_type", "main")),
         "status": status,
-        "generation_run_id": _clean_string(payload.get("generation_run_id", ""), field_name="generation_run_id"),
+        "generation_run_id": _clean_string(
+            payload.get("generation_run_id", ""), field_name="generation_run_id"
+        ),
         "validation": payload.get("validation", {}),
         "recipe": payload.get("recipe", {}),
         "created_at": payload.get("created_at") or utc_now(),
@@ -246,9 +273,15 @@ def normalize_suggestion_document(document: Mapping[str, Any]) -> dict[str, Any]
 def normalize_preference_document(document: Mapping[str, Any]) -> dict[str, Any]:
     payload = deepcopy(dict(document))
     normalized = {
-        "profile_name": _clean_string(payload.get("profile_name", "default"), field_name="profile_name", required=True),
+        "profile_name": _clean_string(
+            payload.get("profile_name", "default"),
+            field_name="profile_name",
+            required=True,
+        ),
         "active": bool(payload.get("active", True)),
-        "hard_avoids": _string_list(payload.get("hard_avoids", []), field_name="hard_avoids"),
+        "hard_avoids": _string_list(
+            payload.get("hard_avoids", []), field_name="hard_avoids"
+        ),
         "likes": _string_list(payload.get("likes", []), field_name="likes"),
         "dislikes": _string_list(payload.get("dislikes", []), field_name="dislikes"),
         "notes": _clean_string(payload.get("notes", ""), field_name="notes"),
@@ -261,7 +294,9 @@ def normalize_preference_document(document: Mapping[str, Any]) -> dict[str, Any]
 
 def normalize_feedback_event_document(document: Mapping[str, Any]) -> dict[str, Any]:
     payload = deepcopy(dict(document))
-    target_type = _clean_string(payload.get("target_type"), field_name="target_type", required=True)
+    target_type = _clean_string(
+        payload.get("target_type"), field_name="target_type", required=True
+    )
     if target_type not in TARGET_TYPES:
         raise ValueError(f"target_type must be one of {sorted(TARGET_TYPES)}")
 
@@ -271,7 +306,9 @@ def normalize_feedback_event_document(document: Mapping[str, Any]) -> dict[str, 
 
     return {
         "target_type": target_type,
-        "target_id": _clean_string(payload.get("target_id"), field_name="target_id", required=True),
+        "target_id": _clean_string(
+            payload.get("target_id"), field_name="target_id", required=True
+        ),
         "signal": signal,
         "notes": _clean_string(payload.get("notes", ""), field_name="notes"),
         "created_at": payload.get("created_at") or utc_now(),
@@ -289,11 +326,15 @@ def normalize_generation_run_document(document: Mapping[str, Any]) -> dict[str, 
     payload = deepcopy(dict(document))
     normalized = {
         "meal_type": _normalize_meal_type(payload.get("meal_type", "main")),
-        "model": _clean_string(payload.get("model", "unknown"), field_name="model", required=True),
+        "model": _clean_string(
+            payload.get("model", "unknown"), field_name="model", required=True
+        ),
         "provider": _clean_string(payload.get("provider", ""), field_name="provider"),
         "prompt": _clean_string(payload.get("prompt", ""), field_name="prompt"),
         "status": normalize_generation_run_status(payload.get("status", "started")),
-        "raw_response": _clean_string(payload.get("raw_response", ""), field_name="raw_response"),
+        "raw_response": _clean_string(
+            payload.get("raw_response", ""), field_name="raw_response"
+        ),
         "error": _clean_string(payload.get("error", ""), field_name="error"),
         "created_at": payload.get("created_at") or utc_now(),
         "updated_at": utc_now(),

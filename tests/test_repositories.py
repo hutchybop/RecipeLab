@@ -58,7 +58,9 @@ class RepositoryTests(unittest.TestCase):
 
     def test_feedback_events_repository_create(self):
         repository = FeedbackEventsRepository(self.db)
-        repository.create({"target_type": "recipe", "target_id": "r1", "signal": "liked"})
+        repository.create(
+            {"target_type": "recipe", "target_id": "r1", "signal": "liked"}
+        )
 
         events = repository.list_for_target(target_type="recipe", target_id="r1")
         self.assertEqual(len(events), 1)

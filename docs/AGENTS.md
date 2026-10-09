@@ -8,7 +8,7 @@
 ## Setup and Run
 - Create env and install deps: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && pip install -r requirements-dev.txt`
 - Local run (non-Docker): `python run.py` (binds `0.0.0.0:3009`)
-- Docker run: `docker compose up --build` (serves on `http://localhost:5000`)
+- Docker run: `docker compose up --build` (serves on `http://localhost:3009`)
 - Smoke check: open `/` and call `GET /api/health` on the active port
 
 ## Required Environment

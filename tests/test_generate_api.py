@@ -27,7 +27,9 @@ class GenerateApiTests(unittest.TestCase):
 
     @patch("app.blueprints.api.routes.get_mongo_db")
     @patch("app.services.generation_service.LLMAdapter.generate_recipe")
-    def test_generate_success_persists_suggestion_and_run(self, mock_generate, mock_get_mongo_db):
+    def test_generate_success_persists_suggestion_and_run(
+        self, mock_generate, mock_get_mongo_db
+    ):
         mock_get_mongo_db.return_value = self.fake_db
         mock_generate.return_value = json.dumps(
             {
@@ -69,7 +71,9 @@ class GenerateApiTests(unittest.TestCase):
 
     @patch("app.blueprints.api.routes.get_mongo_db")
     @patch("app.services.generation_service.LLMAdapter.generate_recipe")
-    def test_generate_invalid_output_returns_draft_invalid(self, mock_generate, mock_get_mongo_db):
+    def test_generate_invalid_output_returns_draft_invalid(
+        self, mock_generate, mock_get_mongo_db
+    ):
         mock_get_mongo_db.return_value = self.fake_db
         mock_generate.return_value = "this is not json"
 
@@ -102,7 +106,9 @@ class GenerateApiTests(unittest.TestCase):
 
     @patch("app.blueprints.api.routes.get_mongo_db")
     @patch("app.blueprints.api.routes.generate_recipe_suggestion")
-    def test_generate_handles_backend_error(self, mock_generate_recipe, mock_get_mongo_db):
+    def test_generate_handles_backend_error(
+        self, mock_generate_recipe, mock_get_mongo_db
+    ):
         mock_get_mongo_db.return_value = self.fake_db
         mock_generate_recipe.side_effect = RuntimeError("db unavailable")
 

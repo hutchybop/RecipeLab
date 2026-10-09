@@ -6,7 +6,11 @@ from pymongo import ASCENDING, DESCENDING
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from ..services.schema_utils import normalize_recipe_document, normalize_recipe_update, utc_now
+from ..services.schema_utils import (
+    normalize_recipe_document,
+    normalize_recipe_update,
+    utc_now,
+)
 from .common import to_object_id
 
 
@@ -47,14 +51,22 @@ class RecipesRepository:
     def get_by_id(self, recipe_id: Any) -> dict[str, Any] | None:
         return self.collection.find_one({"_id": to_object_id(recipe_id)})
 
-    def list(self, *, meal_type: str | None = None, include_deleted: bool = False, limit: int = 100) -> list[dict[str, Any]]:
+    def list(
+        self,
+        *,
+        meal_type: str | None = None,
+        include_deleted: bool = False,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
         filters: dict[str, Any] = {}
         if meal_type:
             filters["meal_type"] = meal_type
         if not include_deleted:
             filters["deleted_at"] = None
 
-        cursor = self.collection.find(filters).sort("created_at", DESCENDING).limit(limit)
+        cursor = (
+            self.collection.find(filters).sort("created_at", DESCENDING).limit(limit)
+        )
         return list(cursor)
 
     def update(self, recipe_id: Any, update_fields: Mapping[str, Any]) -> bool:
@@ -72,7 +84,9 @@ class RecipesRepository:
         )
         return result.modified_count > 0
 
-    def upsert_by_source_path(self, source_path: str, document: Mapping[str, Any]) -> None:
+    def upsert_by_source_path(
+        self, source_path: str, document: Mapping[str, Any]
+    ) -> None:
         normalized = normalize_recipe_document({**document, "source_path": source_path})
         created_at = normalized.pop("created_at")
         self.collection.update_one(

@@ -46,7 +46,9 @@ class LLMAdapterTests(unittest.TestCase):
         self.assertEqual(adapter.base_url, "https://opencode.ai/zen/v1")
 
     def test_routes_gpt_models_to_responses_api(self):
-        client = _FakeClient(responses_text='{"ok":true}', chat_text='{"should":"not_be_used"}')
+        client = _FakeClient(
+            responses_text='{"ok":true}', chat_text='{"should":"not_be_used"}'
+        )
         adapter = LLMAdapter(
             provider="openai_compatible",
             endpoint="https://opencode.ai/zen/v1",
@@ -61,7 +63,9 @@ class LLMAdapterTests(unittest.TestCase):
         self.assertEqual(len(client.chat.completions.calls), 0)
 
     def test_routes_non_gpt_models_to_chat_completions(self):
-        client = _FakeClient(responses_text='{"should":"not_be_used"}', chat_text='{"ok":true}')
+        client = _FakeClient(
+            responses_text='{"should":"not_be_used"}', chat_text='{"ok":true}'
+        )
         adapter = LLMAdapter(
             provider="openai_compatible",
             endpoint="https://opencode.ai/zen/v1",

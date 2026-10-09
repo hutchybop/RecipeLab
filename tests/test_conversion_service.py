@@ -38,7 +38,9 @@ class ConversionServiceTests(unittest.TestCase):
                 "rating": "",
                 "difficulty": "",
                 "tags": ["soup"],
-                "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "stock"}],
+                "ingredients": [
+                    {"quantity": "1", "unit": "cup", "ingredient": "stock"}
+                ],
                 "method": ["Heat stock"],
                 "notes": ["Test note"],
             }
@@ -54,7 +56,9 @@ class ConversionServiceTests(unittest.TestCase):
         self.assertTrue(result["ok"])
         self.assertEqual(result["status"], "draft")
         self.assertEqual(len(self.db["suggestions"].docs), 1)
-        self.assertEqual(self.db["suggestions"].docs[0]["recipe"]["source_type"], "user")
+        self.assertEqual(
+            self.db["suggestions"].docs[0]["recipe"]["source_type"], "user"
+        )
 
     @patch("app.services.generation_service.LLMAdapter.generate_recipe")
     def test_convert_raw_recipe_invalid_output(self, mock_generate):

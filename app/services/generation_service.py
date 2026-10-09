@@ -18,7 +18,13 @@ from .prompt_composer import compose_canonical_conversion_prompt, compose_recipe
 from .schema_utils import normalize_recipe_document
 
 
-def generate_recipe_suggestion(*, db: Database, meal_type: str, instructions: str, model_override: str | None = None) -> dict[str, Any]:
+def generate_recipe_suggestion(
+    *,
+    db: Database,
+    meal_type: str,
+    instructions: str,
+    model_override: str | None = None,
+) -> dict[str, Any]:
     ensure_all_indexes(db)
 
     generation_runs_repository = GenerationRunsRepository(db)
@@ -54,7 +60,9 @@ def generate_recipe_suggestion(*, db: Database, meal_type: str, instructions: st
         }
     )
 
-    adapter = LLMAdapter(provider=provider, endpoint=endpoint, api_key=api_key, model=model)
+    adapter = LLMAdapter(
+        provider=provider, endpoint=endpoint, api_key=api_key, model=model
+    )
 
     try:
         raw_response = adapter.generate_recipe(prompt)
@@ -80,7 +88,9 @@ def generate_recipe_suggestion(*, db: Database, meal_type: str, instructions: st
     validation_errors = suggestion["validation"]["errors"]
 
     if status == "draft":
-        generation_runs_repository.update_status(run["_id"], "succeeded", raw_response=raw_response)
+        generation_runs_repository.update_status(
+            run["_id"], "succeeded", raw_response=raw_response
+        )
     else:
         generation_runs_repository.update_status(
             run["_id"],
@@ -124,7 +134,9 @@ def convert_raw_recipe_to_suggestion(
             "error": "Generation is not configured. Set LLM_PROVIDER and LLM_MODEL in .env.",
         }
 
-    prompt = compose_canonical_conversion_prompt(meal_type=meal_type, raw_recipe_text=raw_recipe_text)
+    prompt = compose_canonical_conversion_prompt(
+        meal_type=meal_type, raw_recipe_text=raw_recipe_text
+    )
 
     run = generation_runs_repository.create(
         {
@@ -136,7 +148,9 @@ def convert_raw_recipe_to_suggestion(
         }
     )
 
-    adapter = LLMAdapter(provider=provider, endpoint=endpoint, api_key=api_key, model=model)
+    adapter = LLMAdapter(
+        provider=provider, endpoint=endpoint, api_key=api_key, model=model
+    )
 
     try:
         raw_response = adapter.generate_recipe(prompt)
@@ -159,13 +173,16 @@ def convert_raw_recipe_to_suggestion(
     )
 
     if suggestion["status"] == "draft":
-        generation_runs_repository.update_status(run["_id"], "succeeded", raw_response=raw_response)
+        generation_runs_repository.update_status(
+            run["_id"], "succeeded", raw_response=raw_response
+        )
     else:
         generation_runs_repository.update_status(
             run["_id"],
             "failed",
             raw_response=raw_response,
-            error="; ".join(suggestion["validation"]["errors"]) or "Invalid recipe output",
+            error="; ".join(suggestion["validation"]["errors"])
+            or "Invalid recipe output",
         )
 
     return {
@@ -231,7 +248,11 @@ def _persist_suggestion_from_raw_response(
 
     return suggestions_repository.create(
         {
-            "title": parsed_recipe.get("title") if parsed_recipe else "Invalid suggestion output",
+            "title": (
+                parsed_recipe.get("title")
+                if parsed_recipe
+                else "Invalid suggestion output"
+            ),
             "meal_type": meal_type,
             "status": status,
             "generation_run_id": generation_run_id,
@@ -244,7 +265,9 @@ def _persist_suggestion_from_raw_response(
     )
 
 
-def _parse_recipe_json(raw_response: str, errors: list[str]) -> Mapping[str, Any] | None:
+def _parse_recipe_json(
+    raw_response: str, errors: list[str]
+) -> Mapping[str, Any] | None:
     try:
         payload = json.loads(raw_response)
     except json.JSONDecodeError:

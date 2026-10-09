@@ -18,14 +18,20 @@ class PreferencesRepository:
     @classmethod
     def ensure_indexes(cls, db: Database) -> None:
         collection = db[cls.collection_name]
-        collection.create_index([("profile_name", ASCENDING)], unique=True, name="preferences_profile_name_unique")
+        collection.create_index(
+            [("profile_name", ASCENDING)],
+            unique=True,
+            name="preferences_profile_name_unique",
+        )
         collection.create_index([("active", ASCENDING)], name="preferences_active")
 
     def upsert_profile(self, document: Mapping[str, Any]) -> dict[str, Any]:
         normalized = normalize_preference_document(document)
 
         if normalized["active"]:
-            self.collection.update_many({"active": True}, {"$set": {"active": False, "updated_at": utc_now()}})
+            self.collection.update_many(
+                {"active": True}, {"$set": {"active": False, "updated_at": utc_now()}}
+            )
 
         self.collection.update_one(
             {"profile_name": normalized["profile_name"]},

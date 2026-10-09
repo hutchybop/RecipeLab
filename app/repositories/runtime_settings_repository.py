@@ -19,7 +19,9 @@ class RuntimeSettingsRepository:
     @classmethod
     def ensure_indexes(cls, db: Database) -> None:
         collection = db[cls.collection_name]
-        collection.create_index([("key", ASCENDING)], unique=True, name="runtime_settings_key_unique")
+        collection.create_index(
+            [("key", ASCENDING)], unique=True, name="runtime_settings_key_unique"
+        )
 
     def get_selected_model(self) -> str:
         record = self.collection.find_one({"key": self._model_key})

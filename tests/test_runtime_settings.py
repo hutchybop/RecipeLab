@@ -53,7 +53,9 @@ class RuntimeSettingsTests(unittest.TestCase):
             )
 
         self.assertTrue(result["ok"])
-        self.assertEqual(self.db["generation_runs"].docs[0]["model"], "deepseek-v4.1-flash")
+        self.assertEqual(
+            self.db["generation_runs"].docs[0]["model"], "deepseek-v4.1-flash"
+        )
 
 
 if __name__ == "__main__":
