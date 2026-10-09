@@ -1,3 +1,20 @@
+## Session 8
+### Friday October 9th
+<br>
+
+**Summary:** This session started Phase 6 feedback intelligence. It added a profile editor UI, feedback capture actions on recipes/suggestions, a profile update suggestion engine, and user-controlled apply/reject workflow for suggested profile changes.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- add profile editor and suggestion workflow - *Added `/profile` UI with pending profile update suggestions and apply/reject actions.*
+- add feedback event capture - *Added feedback forms and `/feedback` endpoint for liked/disliked/note events on recipe/suggestion detail pages.*
+- implement profile refinement engine - *Added token-based feedback analysis to generate profile update suggestions with persistence and tests.*
+---
+<br>
+
 ## Session 7
 ### Friday October 9th
 <br>

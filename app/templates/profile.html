@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Profile · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Tasting Profile</h1>
+        <form method="post" action="{{ url_for('web.profile_page') }}">
+          <input type="hidden" name="action" value="refresh_suggestions" />
+          <button class="btn btn-outline-primary" type="submit">Generate Update Suggestions</button>
+        </form>
+      </div>
+
+      <form method="post" action="{{ url_for('web.profile_page') }}" class="row g-3">
+        <input type="hidden" name="action" value="save_profile" />
+
+        <div class="col-md-4">
+          <label class="form-label" for="profile_name">Profile Name</label>
+          <input class="form-control" id="profile_name" name="profile_name" value="{{ profile.get('profile_name', 'default') }}" required />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="likes">Likes (one per line)</label>
+          <textarea class="form-control" id="likes" name="likes" rows="4">{{ profile.get('likes', [])|join('\n') }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="dislikes">Dislikes (one per line)</label>
+          <textarea class="form-control" id="dislikes" name="dislikes" rows="4">{{ profile.get('dislikes', [])|join('\n') }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="hard_avoids">Hard Avoids (one per line)</label>
+          <textarea class="form-control" id="hard_avoids" name="hard_avoids" rows="4">{{ profile.get('hard_avoids', [])|join('\n') }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="notes">Notes</label>
+          <textarea class="form-control" id="notes" name="notes" rows="4">{{ profile.get('notes', '') }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="h4">Profile Update Suggestions</h2>
+      {% if pending_updates %}
+        <div class="list-group">
+          {% for suggestion in pending_updates %}
+            <div class="list-group-item">
+              <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
+                <div>
+                  <strong>{{ suggestion.get('action') }}</strong>:
+                  <span class="text-primary">{{ suggestion.get('token') }}</span>
+                  <small class="text-muted d-block">Support: {{ suggestion.get('support_count', 0) }} · {{ suggestion.get('notes', '') }}</small>
+                </div>
+                <div class="d-flex gap-2">
+                  <form method="post" action="{{ url_for('web.apply_profile_suggestion', suggestion_id=suggestion['_id']) }}">
+                    <button class="btn btn-sm btn-success" type="submit">Apply</button>
+                  </form>
+                  <form method="post" action="{{ url_for('web.reject_profile_suggestion', suggestion_id=suggestion['_id']) }}">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Reject</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-info mb-0">No pending profile update suggestions.</div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

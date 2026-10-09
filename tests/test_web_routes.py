@@ -127,6 +127,72 @@ class WebRoutesTests(unittest.TestCase):
         self.assertIn(b"Test Suggestion", response.data)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_profile_page_renders(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["preferences"].docs.append(
+            {
+                "_id": "p1",
+                "profile_name": "default",
+                "active": True,
+                "hard_avoids": ["peanuts"],
+                "likes": ["chicken"],
+                "dislikes": [],
+                "notes": "",
+                "weights": {},
+            }
+        )
+
+        response = self.client.get("/profile")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Tasting Profile", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_feedback_post_creates_event(self, mock_db):
+        mock_db.return_value = self.fake_db
+        response = self.client.post(
+            "/feedback",
+            data={
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "liked",
+                "notes": "Great",
+                "return_to": "/recipes",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(self.fake_db["feedback_events"].docs), 1)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_apply_profile_suggestion_route(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["preferences"].docs.append(
+            {
+                "_id": "p1",
+                "profile_name": "default",
+                "active": True,
+                "hard_avoids": [],
+                "likes": [],
+                "dislikes": [],
+                "notes": "",
+                "weights": {},
+            }
+        )
+        self.fake_db["profile_update_suggestions"].docs.append(
+            {
+                "_id": "u1",
+                "action": "add_like",
+                "token": "chicken",
+                "support_count": 2,
+                "status": "pending",
+                "notes": "",
+            }
+        )
+
+        response = self.client.post("/profile/suggestions/u1/apply")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/profile", response.location)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
     def test_accept_suggestion_saves_recipe(self, mock_db):
         mock_db.return_value = self.fake_db
         self.fake_db["suggestions"].docs.append(

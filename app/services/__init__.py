@@ -1,6 +1,11 @@
 from .generation_service import convert_raw_recipe_to_suggestion, generate_recipe_suggestion
 from .llm_adapter import LLMAdapter, LLMAdapterError
-from .prompt_composer import DEFAULT_HARD_CONSTRAINTS, compose_recipe_prompt
+from .profile_refinement_service import (
+    apply_profile_update_suggestion,
+    generate_profile_update_suggestions,
+    reject_profile_update_suggestion,
+)
+from .prompt_composer import DEFAULT_HARD_CONSTRAINTS, compose_canonical_conversion_prompt, compose_recipe_prompt
 from .schema_utils import (
     FEEDBACK_SIGNALS,
     GENERATION_RUN_STATUSES,
@@ -25,8 +30,11 @@ __all__ = [
     "MEAL_TYPES",
     "SUGGESTION_STATUSES",
     "TARGET_TYPES",
+    "apply_profile_update_suggestion",
+    "compose_canonical_conversion_prompt",
     "compose_recipe_prompt",
     "convert_raw_recipe_to_suggestion",
+    "generate_profile_update_suggestions",
     "generate_recipe_suggestion",
     "normalize_feedback_event_document",
     "normalize_generation_run_document",
@@ -35,4 +43,5 @@ __all__ = [
     "normalize_recipe_document",
     "normalize_recipe_update",
     "normalize_suggestion_document",
+    "reject_profile_update_suggestion",
 ]

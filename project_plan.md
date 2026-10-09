@@ -400,7 +400,7 @@ Update this file at every checkpoint.
 - Phase 3: `complete`
 - Phase 4: `complete`
 - Phase 5: `complete`
-- Phase 6: `not_started`
+- Phase 6: `in_progress`
 - Phase 7: `not_started`
 - Phase 8: `not_started`
 
@@ -583,6 +583,33 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09
+
+- Phase: 6 / Profile and Feedback Intelligence
+- Status: `in_progress`
+- What changed:
+  - Added profile editor page (`/profile`) for managing likes, dislikes, hard avoids, and notes.
+  - Added feedback actions on recipe/suggestion detail pages (liked/disliked/note) via `/feedback`.
+  - Added profile update suggestion engine based on feedback signals and ingredient/tag token support.
+  - Added profile update suggestion repository and persistence (`profile_update_suggestions`).
+  - Added apply/reject workflow for profile update suggestions (`/profile/suggestions/<id>/apply|reject`).
+  - Added tests for profile refinement service, feedback/profile routes, and new index expectations.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_profile_refinement_service tests.test_web_routes tests.test_indexes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending profile and feedback workflow walkthrough.
+- Risks/issues:
+  - Token-based refinement suggestions may surface noisy terms until enough feedback data accumulates.
+- Decision(s):
+  - Keep profile updates as user-approved suggestions only; no auto-apply behavior.
+- Next actions:
+  - Run Phase 6 validation checklist and tune suggestion thresholds if needed.
+  - Promote Phase 6 to `complete` after user gate checks pass.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -600,3 +627,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 5 recipe lifecycle implementation started (edit/delete flows, raw import conversion, and review/edit-before-save flow).
+
+### 2026-10-09
+- Phase 6 profile and feedback intelligence started (profile editor, feedback events, profile update suggestions, and approval workflow).

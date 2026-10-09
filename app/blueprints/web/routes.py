@@ -3,8 +3,22 @@ from __future__ import annotations
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from ...extensions import get_mongo_db
-from ...repositories import RecipesRepository, SuggestionsRepository
-from ...services import MEAL_TYPES, convert_raw_recipe_to_suggestion, generate_recipe_suggestion, normalize_recipe_document
+from ...repositories import (
+    FeedbackEventsRepository,
+    PreferencesRepository,
+    ProfileUpdateSuggestionsRepository,
+    RecipesRepository,
+    SuggestionsRepository,
+)
+from ...services import (
+    MEAL_TYPES,
+    apply_profile_update_suggestion,
+    convert_raw_recipe_to_suggestion,
+    generate_profile_update_suggestions,
+    generate_recipe_suggestion,
+    normalize_recipe_document,
+    reject_profile_update_suggestion,
+)
 
 
 web_bp = Blueprint("web", __name__)
@@ -295,6 +309,97 @@ def recipe_detail(recipe_id: str) -> str:
         return redirect(url_for("web.recipes_page"))
 
     return render_template("recipe_detail.html", recipe=recipe)
+
+
+@web_bp.post("/feedback")
+def submit_feedback():
+    target_type = str(request.form.get("target_type", "")).strip()
+    target_id = str(request.form.get("target_id", "")).strip()
+    signal = str(request.form.get("signal", "")).strip()
+    notes = str(request.form.get("notes", "")).strip()
+    return_to = str(request.form.get("return_to", "")).strip() or url_for("web.index")
+
+    if target_type not in {"recipe", "suggestion"}:
+        flash("Invalid feedback target.", "danger")
+        return redirect(return_to)
+    if signal not in {"liked", "disliked", "note"}:
+        flash("Invalid feedback signal.", "danger")
+        return redirect(return_to)
+
+    FeedbackEventsRepository(get_mongo_db()).create(
+        {
+            "target_type": target_type,
+            "target_id": target_id,
+            "signal": signal,
+            "notes": notes,
+        }
+    )
+    flash("Feedback saved.", "success")
+    return redirect(return_to)
+
+
+@web_bp.route("/profile", methods=["GET", "POST"])
+def profile_page() -> str:
+    db = get_mongo_db()
+    preferences_repo = PreferencesRepository(db)
+    updates_repo = ProfileUpdateSuggestionsRepository(db)
+
+    active_profile = preferences_repo.get_active_profile() or {
+        "profile_name": "default",
+        "active": True,
+        "hard_avoids": [],
+        "likes": [],
+        "dislikes": [],
+        "notes": "",
+        "weights": {},
+    }
+
+    if request.method == "POST":
+        action = str(request.form.get("action", "save_profile")).strip()
+
+        if action == "save_profile":
+            profile_name = str(request.form.get("profile_name", active_profile.get("profile_name", "default"))).strip() or "default"
+            hard_avoids = [item.strip() for item in str(request.form.get("hard_avoids", "")).splitlines() if item.strip()]
+            likes = [item.strip() for item in str(request.form.get("likes", "")).splitlines() if item.strip()]
+            dislikes = [item.strip() for item in str(request.form.get("dislikes", "")).splitlines() if item.strip()]
+            notes = str(request.form.get("notes", "")).strip()
+
+            preferences_repo.upsert_profile(
+                {
+                    "profile_name": profile_name,
+                    "active": True,
+                    "hard_avoids": hard_avoids,
+                    "likes": likes,
+                    "dislikes": dislikes,
+                    "notes": notes,
+                    "weights": active_profile.get("weights", {}),
+                }
+            )
+            flash("Profile updated.", "success")
+            return redirect(url_for("web.profile_page"))
+
+        if action == "refresh_suggestions":
+            result = generate_profile_update_suggestions(db)
+            flash(f"Generated {result['created']} profile update suggestion(s).", "info")
+            return redirect(url_for("web.profile_page"))
+
+    pending_updates = updates_repo.list_pending(limit=200)
+    active_profile = preferences_repo.get_active_profile() or active_profile
+    return render_template("profile.html", profile=active_profile, pending_updates=pending_updates)
+
+
+@web_bp.post("/profile/suggestions/<suggestion_id>/apply")
+def apply_profile_suggestion(suggestion_id: str):
+    ok, message = apply_profile_update_suggestion(get_mongo_db(), suggestion_id)
+    flash(message, "success" if ok else "warning")
+    return redirect(url_for("web.profile_page"))
+
+
+@web_bp.post("/profile/suggestions/<suggestion_id>/reject")
+def reject_profile_suggestion(suggestion_id: str):
+    updated = reject_profile_update_suggestion(get_mongo_db(), suggestion_id)
+    flash("Suggestion rejected." if updated else "Suggestion not found.", "info" if updated else "warning")
+    return redirect(url_for("web.profile_page"))
 
 
 @web_bp.route("/recipes/<recipe_id>/edit", methods=["GET", "POST"])
