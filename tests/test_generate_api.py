@@ -100,6 +100,21 @@ class GenerateApiTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    @patch("app.blueprints.api.routes.get_mongo_db")
+    @patch("app.blueprints.api.routes.generate_recipe_suggestion")
+    def test_generate_handles_backend_error(self, mock_generate_recipe, mock_get_mongo_db):
+        mock_get_mongo_db.return_value = self.fake_db
+        mock_generate_recipe.side_effect = RuntimeError("db unavailable")
+
+        response = self.client.post(
+            "/api/generate",
+            json={"meal_type": "main", "instructions": "quick"},
+        )
+
+        self.assertEqual(response.status_code, 503)
+        payload = response.get_json()
+        self.assertIn("database connection failed", payload["error"])
+
 
 if __name__ == "__main__":
     unittest.main()

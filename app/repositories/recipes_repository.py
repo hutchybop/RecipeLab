@@ -38,6 +38,8 @@ class RecipesRepository:
 
     def create(self, document: Mapping[str, Any]) -> dict[str, Any]:
         normalized = normalize_recipe_document(document)
+        if normalized.get("source_path") == "":
+            normalized.pop("source_path", None)
         insert_result = self.collection.insert_one(normalized)
         normalized["_id"] = insert_result.inserted_id
         return normalized

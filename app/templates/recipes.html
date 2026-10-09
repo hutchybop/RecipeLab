@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Recipe Library · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Recipe Library</h1>
+    <a class="btn btn-primary" href="{{ url_for('web.generate_page') }}">Generate Recipe</a>
+  </div>
+
+  <form method="get" class="mb-3">
+    <label class="form-label" for="meal_type">Meal Type Filter</label>
+    <select class="form-select" id="meal_type" name="meal_type" onchange="this.form.submit()">
+      <option value="" {% if not selected_meal_type %}selected{% endif %}>all</option>
+      {% for meal_type in meal_types %}
+        <option value="{{ meal_type }}" {% if selected_meal_type == meal_type %}selected{% endif %}>{{ meal_type }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  {% if recipes %}
+    <div class="list-group shadow-sm">
+      {% for recipe in recipes %}
+        <a class="list-group-item list-group-item-action" href="{{ url_for('web.recipe_detail', recipe_id=recipe['_id']) }}">
+          <div class="d-flex w-100 justify-content-between align-items-center">
+            <h2 class="h6 mb-1">{{ recipe.get('title', 'Untitled') }}</h2>
+            <span class="badge {% if recipe.get('source_type') == 'ai' %}bg-primary{% else %}bg-secondary{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
+          </div>
+          <small class="text-muted">Meal: {{ recipe.get('meal_type', '-') }}</small>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No recipes found.</div>
+  {% endif %}
+{% endblock %}

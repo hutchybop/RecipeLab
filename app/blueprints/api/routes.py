@@ -44,12 +44,23 @@ def generate_recipe():
             400,
         )
 
-    result = generate_recipe_suggestion(
-        db=get_mongo_db(),
-        meal_type=meal_type,
-        instructions=instructions,
-        model_override=str(model_override).strip() if isinstance(model_override, str) else None,
-    )
+    try:
+        result = generate_recipe_suggestion(
+            db=get_mongo_db(),
+            meal_type=meal_type,
+            instructions=instructions,
+            model_override=str(model_override).strip() if isinstance(model_override, str) else None,
+        )
+    except Exception:
+        return (
+            jsonify(
+                {
+                    "error": "Generation is temporarily unavailable because the database connection failed.",
+                    "run_id": None,
+                }
+            ),
+            503,
+        )
 
     if not result["ok"]:
         status_code = int(result.get("status_code", 500))

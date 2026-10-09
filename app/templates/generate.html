@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Generate · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h3 mb-3">Generate a Recipe</h1>
+      <form method="post" action="{{ url_for('web.generate_page') }}" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="meal_type">Meal Type</label>
+          <select class="form-select" id="meal_type" name="meal_type" required>
+            {% for meal_type in meal_types %}
+              <option value="{{ meal_type }}" {% if meal_type == selected_meal_type %}selected{% endif %}>{{ meal_type }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-8">
+          <label class="form-label" for="model">Model Override (optional)</label>
+          <input class="form-control" id="model" name="model" value="{{ model_override }}" placeholder="e.g. deepseek-v4.1-flash" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label" for="instructions">Instructions</label>
+          <textarea
+            class="form-control"
+            id="instructions"
+            name="instructions"
+            rows="6"
+            placeholder="Describe constraints, flavor profile, nutrition goals, and timing..."
+          >{{ instructions }}</textarea>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit">Generate</button>
+          <a class="btn btn-outline-secondary" href="{{ url_for('web.suggestions_page') }}">View Suggestions</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

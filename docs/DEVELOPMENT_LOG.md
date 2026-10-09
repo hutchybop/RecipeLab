@@ -1,3 +1,20 @@
+## Session 6
+### Friday October 9th
+<br>
+
+**Summary:** This session started Phase 4 by implementing the core Bootstrap UI for end-to-end recipe flow. It added dashboard, generate, suggestions, and recipe library/detail pages, wired web routes to repository/service layers, and introduced web route tests for key UI interactions.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- implement phase 4 core ui - *Added navigation/layout and friendly MVP pages for dashboard, generate, suggestions, and recipe library/detail.*
+- wire review and save flow - *Added suggestion accept/reject actions to support generate -> review -> save workflow without API tooling.*
+- add web route tests - *Added tests for dashboard, generate route behavior, suggestions rendering, and suggestion acceptance flow.*
+---
+<br>
+
 ## Session 5
 ### Thursday October 8th
 <br>

@@ -398,7 +398,7 @@ Update this file at every checkpoint.
 - Phase 1: `complete`
 - Phase 2: `complete`
 - Phase 3: `complete`
-- Phase 4: `not_started`
+- Phase 4: `complete`
 - Phase 5: `not_started`
 - Phase 6: `not_started`
 - Phase 7: `not_started`
@@ -528,6 +528,33 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09
+
+- Phase: 4 / Core UI (Friendly MVP)
+- Status: `in_progress`
+- What changed:
+  - Added Bootstrap UI layout/navigation and dashboard summary view.
+  - Added generate page and web form flow wired to generation service.
+  - Added suggestions list/detail views with status badges and clear review states.
+  - Added accept/reject suggestion actions to support generate -> review -> save flow.
+  - Added recipe library and recipe detail pages with meal-type filter and source badges.
+  - Added web route tests for core Phase 4 flows.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending user walkthrough of end-to-end UI flow.
+- Risks/issues:
+  - Some model options in Zen may be account-gated, affecting model override behavior in UI.
+- Decision(s):
+  - Keep model override in generate form to support constrained provider/model testing during MVP.
+- Next actions:
+  - Run Phase 4 UI walkthrough checklist and gather usability feedback.
+  - Promote Phase 4 to `complete` once validation gate passes.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -539,3 +566,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-08
 - Phase 3 generation pipeline implementation started (prompt composer, LLM adapter, `/api/generate`, parsing/validation, suggestion persistence, and run logging).
+
+### 2026-10-09
+- Phase 4 core Bootstrap UI implementation started (dashboard, generate, suggestions, recipe library/detail, and web route tests).

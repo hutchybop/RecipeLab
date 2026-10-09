@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Suggestion Detail · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{{ suggestion.get('title', 'Untitled suggestion') }}</h1>
+    <span class="badge {% if suggestion.get('status') == 'draft' %}bg-success{% elif suggestion.get('status') == 'draft_invalid' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ suggestion.get('status') }}</span>
+  </div>
+
+  {% set recipe = suggestion.get('recipe', {}) %}
+  {% set metadata = recipe.get('metadata', {}) %}
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <p class="mb-2"><strong>Meal Type:</strong> {{ suggestion.get('meal_type', '-') }}</p>
+      <p class="mb-2"><strong>Servings:</strong> {{ metadata.get('servings', '-') }}</p>
+      <p class="mb-2"><strong>Prep/Cook:</strong> {{ metadata.get('prep_time', '-') }} / {{ metadata.get('cook_time', '-') }}</p>
+      <p class="mb-0"><strong>Tags:</strong> {{ metadata.get('tags', [])|join(', ') }}</p>
+    </div>
+  </div>
+
+  {% if suggestion.get('validation', {}).get('errors') %}
+    <div class="alert alert-warning">
+      <strong>Validation Issues:</strong>
+      <ul class="mb-0">
+        {% for err in suggestion.get('validation', {}).get('errors', []) %}
+          <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="row g-3 mb-3">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Ingredients</h2>
+          <ul class="mb-0">
+            {% for item in recipe.get('ingredients', []) %}
+              <li>{{ item.get('quantity', '') }} {{ item.get('unit', '') }} {{ item.get('ingredient', '') }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Method</h2>
+          <ol class="mb-0">
+            {% for step in recipe.get('method', []) %}
+              <li>{{ step }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2">
+    {% if suggestion.get('status') == 'draft' %}
+      <form method="post" action="{{ url_for('web.accept_suggestion', suggestion_id=suggestion['_id']) }}">
+        <button class="btn btn-success" type="submit">Save to Recipe Library</button>
+      </form>
+    {% endif %}
+
+    {% if suggestion.get('status') in ['draft', 'draft_invalid'] %}
+      <form method="post" action="{{ url_for('web.reject_suggestion', suggestion_id=suggestion['_id']) }}">
+        <button class="btn btn-outline-danger" type="submit">Reject Suggestion</button>
+      </form>
+    {% endif %}
+
+    <a class="btn btn-outline-secondary" href="{{ url_for('web.suggestions_page') }}">Back to Suggestions</a>
+  </div>
+{% endblock %}

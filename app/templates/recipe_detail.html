@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Recipe Detail · RecipeLab{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{{ recipe.get('title', 'Untitled recipe') }}</h1>
+    <span class="badge {% if recipe.get('source_type') == 'ai' %}bg-primary{% else %}bg-secondary{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
+  </div>
+
+  {% set metadata = recipe.get('metadata', {}) %}
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <p class="mb-2"><strong>Meal Type:</strong> {{ recipe.get('meal_type', '-') }}</p>
+      <p class="mb-2"><strong>Servings:</strong> {{ metadata.get('servings', '-') }}</p>
+      <p class="mb-2"><strong>Prep/Cook:</strong> {{ metadata.get('prep_time', '-') }} / {{ metadata.get('cook_time', '-') }}</p>
+      <p class="mb-0"><strong>Tags:</strong> {{ metadata.get('tags', [])|join(', ') }}</p>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Ingredients</h2>
+          <ul class="mb-0">
+            {% for item in recipe.get('ingredients', []) %}
+              <li>{{ item.get('quantity', '') }} {{ item.get('unit', '') }} {{ item.get('ingredient', '') }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5">Method</h2>
+          <ol class="mb-0">
+            {% for step in recipe.get('method', []) %}
+              <li>{{ step }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if recipe.get('notes') %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h2 class="h5">Notes</h2>
+        <ul class="mb-0">
+          {% for note in recipe.get('notes', []) %}
+            <li>{{ note }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <a class="btn btn-outline-secondary" href="{{ url_for('web.recipes_page') }}">Back to Library</a>
+{% endblock %}
