@@ -13,7 +13,7 @@ Service Name: recipelab
 - [x] Repo contains `.github/workflows/docker-release.yml`
 - [x] Repo contains `Dockerfile`
 - [x] Server docker directory exists with `docker-compose.yml` based on `docker-compose-example.yml`
-- [ ] Server `.env` is present in `/home/hutch/dockers/recipelab/.env`
+- [x] Server `.env` is present in `/home/hutch/dockers/recipelab/.env`
 
 ---
 
