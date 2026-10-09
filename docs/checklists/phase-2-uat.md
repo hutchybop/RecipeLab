@@ -3,20 +3,20 @@
 Date: 26-10-08
 Tester: hutch
 Environment/Branch: .venv main
-Mongo DB Name Used: RecipeLab_phase2_uat
+Mongo DB Name Used: recipelab_phase2_uat
 
 ---
 
 ## 1) Preconditions
 
 - [ ] `.env` is present and contains `SECRET_KEY` and `MONGO_URI`
-- [ ] Using a dedicated validation DB name (recommended), e.g. `RecipeLab_phase2_uat`
+- [ ] Using a dedicated validation DB name (recommended), e.g. `recipelab_phase2_uat`
 - [ ] Virtual environment is active or `.venv/bin/python` is available
 
 Optional `.env` setting:
 
 ```env
-MONGO_DB_NAME=RecipeLab_phase2_uat
+MONGO_DB_NAME=recipelab_phase2_uat
 ```
 
 ---
@@ -32,7 +32,7 @@ Command:
 Record output:
 
 ```
-import complete: 44 recipes processed from /Users/hutch/Coding/RecipeLab/recipes
+import complete: 44 recipes processed from /Users/hutch/Coding/docker-apps/recipelab/recipes
 ```
 
 Checks:

@@ -14,7 +14,7 @@ class GenerateApiTests(unittest.TestCase):
     def setUp(self):
         os.environ["SECRET_KEY"] = "test-secret"
         os.environ["MONGO_URI"] = "mongodb://localhost:27017"
-        os.environ["MONGO_DB_NAME"] = "RecipeLab_test"
+        os.environ["MONGO_DB_NAME"] = "recipelab_test"
         os.environ["LLM_PROVIDER"] = "openai_compatible"
         os.environ["LLM_MODEL"] = "test-model"
 

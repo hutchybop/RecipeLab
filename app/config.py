@@ -26,7 +26,7 @@ class AppConfig:
         return cls(
             secret_key=os.getenv("SECRET_KEY", ""),
             mongo_uri=os.getenv("MONGO_URI", ""),
-            mongo_db_name=os.getenv("MONGO_DB_NAME", "RecipeLab"),
+            mongo_db_name=os.getenv("MONGO_DB_NAME", "recipelab"),
             log_level=os.getenv("LOG_LEVEL", "INFO"),
             llm_provider=os.getenv("LLM_PROVIDER", "openai_compatible"),
             llm_endpoint=os.getenv("LLM_ENDPOINT", ""),

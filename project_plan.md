@@ -330,22 +330,27 @@ Exit Criteria:
 ### Phase 8 - Docker Release and GHCR Automation
 
 Objective:
-- Ship reliable container builds through GitHub.
+- Ship reliable, script-compatible container releases through GitHub and GHCR.
 
 Deliverables:
-- GitHub Actions workflow: test -> build -> push image to GHCR.
-- Tagging strategy (`latest`, semver/tag, short SHA).
-- Deployment/runbook documentation.
+- GitHub Actions workflow at `.github/workflows/docker-release.yml` that runs tests first, then builds/pushes GHCR image.
+- Release trigger aligned to shipping flow: semver git tags (`v*.*.*`).
+- GHCR tagging output aligned to server pull flow: `latest`, semver tag, short SHA.
+- `docker-compose-example.yml` validated for server usage (`ghcr.io/hutchybop/recipelab:latest`, `container_name: recipelab`, external `npm_network`).
+- Ship-script compatibility checklist documented (`DOCKER_SERVICE_NAME=recipelab`, `APP_TYPE=py`, repo contains `.github/` + `Dockerfile`).
+- Lint/format baseline configured for Python projects (`.flake8`, `pyproject.toml`, `requirements-dev.txt`).
 
 Testing:
-- CI pipeline pass on PR/main.
-- Pull/run GHCR image on clean environment.
+- Local lint + format checks pass (`black`, `flake8`) using project config.
+- Local automated tests pass (`unittest`, compile check).
+- Tag push (`vX.Y.Z`) successfully runs workflow and publishes GHCR image.
+- Server-side `docker compose pull && docker compose up -d` succeeds using `docker-compose-example.yml`.
 
 Validation Gate:
-- User deploys from GHCR image and passes smoke checklist.
+- User deploys via `ship/ship.sh` to longrunner using `DOCKER_SERVICE_NAME=recipelab` and passes smoke checklist (`/api/health`, UI load, logs clean).
 
 Exit Criteria:
-- Repeatable image delivery and personal deployment flow.
+- Repeatable image delivery and deployment through existing `ship` scripts with no project-specific script edits required.
 
 ---
 
@@ -429,7 +434,7 @@ Update this file at every checkpoint.
 - Phase 6: `complete`
 - Phase 6.1: `complete`
 - Phase 7: `complete`
-- Phase 8: `not_started`
+- Phase 8: `in_progress`
 
 ### Checkpoint Log Template
 
@@ -712,6 +717,34 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09 (Phase 8 Readiness and Compatibility Update)
+
+- Phase: 8 / Docker Release and GHCR Automation
+- Status: `in_progress`
+- What changed:
+  - Added GitHub Actions release workflow at `.github/workflows/docker-release.yml` (test -> build/push GHCR via reusable workflow).
+  - Confirmed workflow trigger matches `ship` tag flow (`v*.*.*`) and GHCR image naming (`ghcr.io/hutchybop/recipelab`).
+  - Added lint/format configuration for Python shipping checks: `.flake8`, `pyproject.toml`, and `requirements-dev.txt`.
+  - Aligned project naming to `recipelab` across app templates, env examples, tests, and checklists.
+  - Aligned local Docker image naming to `recipelab:local` for consistency.
+- Tests run:
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+  - `.venv/bin/python -m flake8 .`
+- User validation outcome:
+  - Pending first tagged GHCR release and server pull/restart smoke test.
+- Risks/issues:
+  - Existing local `.venv` has stale shebang paths from pre-rename directory; recreating venv is recommended before routine ship runs.
+- Decision(s):
+  - Use tag-driven Docker release workflow (same pattern as sibling docker projects).
+  - Keep release image tags as `latest` + semver + short SHA to support both quick pull and traceability.
+- Next actions:
+  - Create/verify `ship/.env_ship.sh` in this repo with `DOCKER_SERVICE_NAME=recipelab` and `APP_TYPE=py`.
+  - Run first Phase 8 release tag (`vX.Y.Z`) and confirm GHCR publish.
+  - Deploy on server using final `docker-compose-example.yml` and complete Phase 8 UAT checklist.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -738,3 +771,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 7 utility features started (PDF export and runtime model settings page with env-managed provider/endpoint display).
+
+### 2026-10-09
+- Phase 8 readiness update completed: added GHCR release workflow, lint/format config, ship-script compatibility alignment, and naming standardization to `recipelab`.

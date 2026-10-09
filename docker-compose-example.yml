@@ -1,0 +1,34 @@
+services:
+  recipelab:
+    image: ghcr.io/hutchybop/recipelab:latest
+    container_name: recipelab
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=5)"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - npm_network
+
+networks:
+  npm_network:
+    external: true

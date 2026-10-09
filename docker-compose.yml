@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    image: recipe-ai-app:local
+    image: recipelab:local
     ports:
       - "5000:5000"
     env_file:

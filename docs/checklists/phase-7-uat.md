@@ -3,7 +3,7 @@
 Date: 26-10-09
 Tester: hutch
 Environment/Branch: .venv main
-Mongo DB Name Used: RecipeLab_phase2_uat
+Mongo DB Name Used: recipelab_phase2_uat
 
 ---
 

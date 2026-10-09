@@ -2,10 +2,11 @@
 
 ## Current Repo Reality
 - This repo is both a Flask app and a recipe markdown library; do not assume markdown-only.
-- There is no CI, lint, formatter, or test config in the repo today.
+- GitHub Actions Docker release workflow exists at `.github/workflows/docker-release.yml`.
+- Lint/format config is defined in `.flake8` and `pyproject.toml`.
 
 ## Setup and Run
-- Create env and install deps: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
+- Create env and install deps: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && pip install -r requirements-dev.txt`
 - Local run (non-Docker): `python run.py` (binds `0.0.0.0:3009`)
 - Docker run: `docker compose up --build` (serves on `http://localhost:5000`)
 - Smoke check: open `/` and call `GET /api/health` on the active port
@@ -13,7 +14,7 @@
 ## Required Environment
 - App startup fails if `SECRET_KEY` or `MONGO_URI` is missing (`AppConfig.validate()` in `app/config.py`).
 - Copy `.env.example` to `.env`; `load_dotenv()` is called in `app/config.py`, so local runs load it automatically.
-- `MONGO_DB_NAME` defaults to `RecipeLab` in code if unset.
+- `MONGO_DB_NAME` defaults to `recipelab` in code if unset.
 
 ## Code Map (High Signal)
 - `run.py` creates `app` via `create_app()` and is also the gunicorn target (`run:app`).
