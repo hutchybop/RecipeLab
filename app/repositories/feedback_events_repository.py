@@ -36,3 +36,7 @@ class FeedbackEventsRepository:
 
     def list_recent(self, *, limit: int = 300) -> list[dict[str, Any]]:
         return list(self.collection.find({}).sort("created_at", DESCENDING).limit(limit))
+
+    def latest_for_target(self, *, target_type: str, target_id: str) -> dict[str, Any] | None:
+        events = self.list_for_target(target_type=target_type, target_id=target_id, limit=1)
+        return events[0] if events else None

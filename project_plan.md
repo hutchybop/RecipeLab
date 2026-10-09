@@ -279,6 +279,32 @@ Exit Criteria:
 
 ---
 
+### Phase 6.1 - Feedback Visibility and Decision History
+
+Objective:
+- Make saved feedback and profile-update decisions visible and understandable at a glance.
+
+Deliverables:
+- Recipe detail and suggestion detail pages show current feedback state (`liked`/`disliked` and note-presence).
+- Recipe detail and suggestion detail pages show recent feedback history (signal, note, timestamp).
+- Feedback controls visually reflect active selections for quick recognition.
+- Profile page shows pending suggestions plus separate history sections for `applied` and `rejected` profile updates.
+- Repository helpers for latest feedback state and status-based profile-update listing.
+
+Testing:
+- Route/template tests for feedback state and history rendering on recipe/suggestion pages.
+- Route/template tests for profile `applied` and `rejected` suggestion history sections.
+- Regression run for existing Phase 6 workflows.
+
+Validation Gate:
+- User can return later and immediately see prior feedback state and profile-update outcomes without DB inspection.
+
+Exit Criteria:
+- No ambiguity about whether feedback/profile actions were persisted.
+- Existing Phase 6 behavior remains intact.
+
+---
+
 ### Phase 7 - PDF Export and Runtime Settings UX
 
 Objective:
@@ -400,7 +426,8 @@ Update this file at every checkpoint.
 - Phase 3: `complete`
 - Phase 4: `complete`
 - Phase 5: `complete`
-- Phase 6: `in_progress`
+- Phase 6: `complete`
+- Phase 6.1: `complete`
 - Phase 7: `not_started`
 - Phase 8: `not_started`
 
@@ -610,6 +637,33 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-09
+
+- Phase: 6.1 / Feedback Visibility and Decision History
+- Status: `in_progress`
+- What changed:
+  - Added feedback state rendering on recipe/suggestion detail pages (current like/dislike + note indicator).
+  - Added recent feedback history lists on recipe/suggestion detail pages.
+  - Updated feedback action buttons to visibly reflect the current saved state.
+  - Added profile page history sections for applied and rejected profile update suggestions.
+  - Added repository helper for profile update suggestions by status and route wiring for history sections.
+  - Added/extended web route tests for feedback visibility and profile suggestion history.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes tests.test_profile_refinement_service tests.test_indexes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending user walkthrough for visibility UX confirmation.
+- Risks/issues:
+  - Timestamp display is currently raw datetime string formatting from stored values.
+- Decision(s):
+  - Keep event-stream model append-only; derive visible current state from latest events.
+- Next actions:
+  - Run updated Phase 6 UAT checklist including visibility/history checks.
+  - Promote Phase 6.1 (and Phase 6 scope) to `complete` after user sign-off.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -630,3 +684,6 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 6 profile and feedback intelligence started (profile editor, feedback events, profile update suggestions, and approval workflow).
+
+### 2026-10-09
+- Phase 6.1 feedback visibility started (current-state indicators and history for feedback + applied/rejected profile suggestion history UI).

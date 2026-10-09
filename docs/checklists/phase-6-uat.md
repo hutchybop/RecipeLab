@@ -57,6 +57,26 @@ PY
 
 ---
 
+## 3.1) Feedback Visibility and Recall (Phase 6.1)
+
+Manual checks on `/recipes/<id>` after saving feedback:
+- [x] Current feedback section shows saved `Liked` or `Disliked` state
+- [x] If a note was saved, `Note saved` indicator appears
+- [x] Action button styling reflects the active selection
+- [x] Recent feedback history list shows signal + note + timestamp
+
+Manual checks on `/suggestions/<id>` after saving feedback:
+- [x] Current feedback section shows saved `Liked` or `Disliked` state
+- [x] If a note was saved, `Note saved` indicator appears
+- [x] Action button styling reflects the active selection
+- [x] Recent feedback history list shows signal + note + timestamp
+
+Persistence recall checks:
+- [x] Navigate away and return; feedback state remains visible
+- [x] Feedback note input is prefilled with latest note (if present)
+
+---
+
 ## 4) Profile Update Suggestion Generation
 
 Manual checks at `/profile`:
@@ -92,6 +112,11 @@ PY
 
 - [x] Status transitions are correct (`pending` -> `applied`/`rejected`)
 
+Phase 6.1 visibility checks at `/profile`:
+- [x] Applied suggestions appear in **Applied Suggestions** history
+- [x] Rejected suggestions appear in **Rejected Suggestions** history
+- [x] Pending list excludes already applied/rejected items
+
 ---
 
 ## 6) Control and Drift Safety Checks
@@ -122,6 +147,8 @@ Run:
 ## 8) Validation Gate Decision
 
 Gate requirement: user validates profile updates are useful and controllable.
+
+Phase 6.1 additional gate requirement: user can clearly see prior feedback and profile-update outcomes.
 
 Overall Result:
 - [x] PASS - Phase 6 validation gate complete

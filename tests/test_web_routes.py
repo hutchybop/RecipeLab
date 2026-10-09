@@ -147,6 +147,92 @@ class WebRoutesTests(unittest.TestCase):
         self.assertIn(b"Tasting Profile", response.data)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_profile_page_shows_applied_and_rejected_history(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["preferences"].docs.append(
+            {
+                "_id": "p1",
+                "profile_name": "default",
+                "active": True,
+                "hard_avoids": [],
+                "likes": [],
+                "dislikes": [],
+                "notes": "",
+                "weights": {},
+            }
+        )
+        self.fake_db["profile_update_suggestions"].docs.extend(
+            [
+                {"_id": "u1", "action": "add_like", "token": "chicken", "support_count": 3, "status": "applied", "updated_at": 2},
+                {"_id": "u2", "action": "add_dislike", "token": "cilantro", "support_count": 2, "status": "rejected", "updated_at": 1},
+            ]
+        )
+
+        response = self.client.get("/profile")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Applied Suggestions", response.data)
+        self.assertIn(b"Rejected Suggestions", response.data)
+        self.assertIn(b"chicken", response.data)
+        self.assertIn(b"cilantro", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_recipe_detail_shows_feedback_state_and_history(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["recipes"].docs.append(
+            {
+                "_id": "r1",
+                "title": "Test Recipe",
+                "meal_type": "main",
+                "source_type": "user",
+                "ingredients": [{"quantity": "1", "unit": "cup", "ingredient": "rice"}],
+                "method": ["Cook rice"],
+                "notes": [],
+                "metadata": {"tags": []},
+                "deleted_at": None,
+            }
+        )
+        self.fake_db["feedback_events"].docs.extend(
+            [
+                {"_id": "f2", "target_type": "recipe", "target_id": "r1", "signal": "note", "notes": "Great texture", "created_at": 2},
+                {"_id": "f1", "target_type": "recipe", "target_id": "r1", "signal": "liked", "notes": "", "created_at": 1},
+            ]
+        )
+
+        response = self.client.get("/recipes/r1")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Current feedback", response.data)
+        self.assertIn(b"Note saved", response.data)
+        self.assertIn(b"Recent feedback history", response.data)
+        self.assertIn(b"Great texture", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_suggestion_detail_shows_feedback_state_and_history(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["suggestions"].docs.append(
+            {
+                "_id": "s1",
+                "title": "Test Suggestion",
+                "meal_type": "main",
+                "status": "draft",
+                "recipe": {"ingredients": [], "method": [], "metadata": {}},
+                "validation": {"valid": True, "errors": []},
+                "created_at": 1,
+            }
+        )
+        self.fake_db["feedback_events"].docs.extend(
+            [
+                {"_id": "f2", "target_type": "suggestion", "target_id": "s1", "signal": "disliked", "notes": "", "created_at": 2},
+                {"_id": "f1", "target_type": "suggestion", "target_id": "s1", "signal": "note", "notes": "Too salty", "created_at": 1},
+            ]
+        )
+
+        response = self.client.get("/suggestions/s1")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Current feedback", response.data)
+        self.assertIn(b"Disliked", response.data)
+        self.assertIn(b"Too salty", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
     def test_feedback_post_creates_event(self, mock_db):
         mock_db.return_value = self.fake_db
         response = self.client.post(

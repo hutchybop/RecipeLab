@@ -48,9 +48,9 @@
     </div>
   </div>
 
-  <div class="card border-0 shadow-sm">
+  <div class="card border-0 shadow-sm mb-3">
     <div class="card-body p-4">
-      <h2 class="h4">Profile Update Suggestions</h2>
+      <h2 class="h4">Pending Profile Update Suggestions</h2>
       {% if pending_updates %}
         <div class="list-group">
           {% for suggestion in pending_updates %}
@@ -76,6 +76,50 @@
       {% else %}
         <div class="alert alert-info mb-0">No pending profile update suggestions.</div>
       {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <h2 class="h5">Applied Suggestions</h2>
+          {% if applied_updates %}
+            <ul class="mb-0">
+              {% for suggestion in applied_updates %}
+                <li>
+                  <strong>{{ suggestion.get('action') }}</strong>:
+                  {{ suggestion.get('token') }}
+                  <span class="text-muted">(support: {{ suggestion.get('support_count', 0) }}, updated: {{ suggestion.get('updated_at') }})</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">No applied suggestions yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <h2 class="h5">Rejected Suggestions</h2>
+          {% if rejected_updates %}
+            <ul class="mb-0">
+              {% for suggestion in rejected_updates %}
+                <li>
+                  <strong>{{ suggestion.get('action') }}</strong>:
+                  {{ suggestion.get('token') }}
+                  <span class="text-muted">(support: {{ suggestion.get('support_count', 0) }}, updated: {{ suggestion.get('updated_at') }})</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted mb-0">No rejected suggestions yet.</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}

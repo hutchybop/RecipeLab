@@ -110,11 +110,21 @@ def suggestions_page() -> str:
 
 @web_bp.get("/suggestions/<suggestion_id>")
 def suggestion_detail(suggestion_id: str) -> str:
-    suggestion = SuggestionsRepository(get_mongo_db()).get_by_id(suggestion_id)
+    db = get_mongo_db()
+    suggestion = SuggestionsRepository(db).get_by_id(suggestion_id)
     if not suggestion:
         flash("Suggestion not found.", "warning")
         return redirect(url_for("web.suggestions_page"))
-    return render_template("suggestion_detail.html", suggestion=suggestion)
+
+    feedback_repo = FeedbackEventsRepository(db)
+    feedback_history = feedback_repo.list_for_target(target_type="suggestion", target_id=suggestion_id, limit=20)
+    feedback_state = _feedback_state_from_events(feedback_history)
+    return render_template(
+        "suggestion_detail.html",
+        suggestion=suggestion,
+        feedback_state=feedback_state,
+        feedback_history=feedback_history,
+    )
 
 
 @web_bp.route("/suggestions/<suggestion_id>/edit", methods=["GET", "POST"])
@@ -303,12 +313,22 @@ def import_recipe_page() -> str:
 
 @web_bp.get("/recipes/<recipe_id>")
 def recipe_detail(recipe_id: str) -> str:
-    recipe = RecipesRepository(get_mongo_db()).get_by_id(recipe_id)
+    db = get_mongo_db()
+    recipe = RecipesRepository(db).get_by_id(recipe_id)
     if not recipe or recipe.get("deleted_at") is not None:
         flash("Recipe not found.", "warning")
         return redirect(url_for("web.recipes_page"))
 
-    return render_template("recipe_detail.html", recipe=recipe)
+    feedback_repo = FeedbackEventsRepository(db)
+    feedback_history = feedback_repo.list_for_target(target_type="recipe", target_id=recipe_id, limit=20)
+    feedback_state = _feedback_state_from_events(feedback_history)
+
+    return render_template(
+        "recipe_detail.html",
+        recipe=recipe,
+        feedback_state=feedback_state,
+        feedback_history=feedback_history,
+    )
 
 
 @web_bp.post("/feedback")
@@ -384,8 +404,16 @@ def profile_page() -> str:
             return redirect(url_for("web.profile_page"))
 
     pending_updates = updates_repo.list_pending(limit=200)
+    applied_updates = updates_repo.list_by_status("applied", limit=200)
+    rejected_updates = updates_repo.list_by_status("rejected", limit=200)
     active_profile = preferences_repo.get_active_profile() or active_profile
-    return render_template("profile.html", profile=active_profile, pending_updates=pending_updates)
+    return render_template(
+        "profile.html",
+        profile=active_profile,
+        pending_updates=pending_updates,
+        applied_updates=applied_updates,
+        rejected_updates=rejected_updates,
+    )
 
 
 @web_bp.post("/profile/suggestions/<suggestion_id>/apply")
@@ -461,3 +489,33 @@ def delete_recipe(recipe_id: str):
     else:
         flash("Recipe not found.", "warning")
     return redirect(url_for("web.recipes_page"))
+
+
+def _feedback_state_from_events(events: list[dict]) -> dict[str, str]:
+    reaction = ""
+    reaction_at = ""
+    latest_note = ""
+    latest_note_at = ""
+
+    for event in events:
+        signal = str(event.get("signal", ""))
+        notes = str(event.get("notes", "")).strip()
+        created_at = str(event.get("created_at", ""))
+
+        if not reaction and signal in {"liked", "disliked"}:
+            reaction = signal
+            reaction_at = created_at
+
+        if not latest_note and notes:
+            latest_note = notes
+            latest_note_at = created_at
+
+        if reaction and latest_note:
+            break
+
+    return {
+        "reaction": reaction,
+        "reaction_at": reaction_at,
+        "latest_note": latest_note,
+        "latest_note_at": latest_note_at,
+    }

@@ -15,6 +15,24 @@ pending
 ---
 <br>
 
+## Session 9
+### Friday October 9th
+<br>
+
+**Summary:** This session implemented Phase 6.1 visibility improvements. It added persistent feedback state indicators and feedback history on recipe/suggestion detail pages, plus applied/rejected history sections for profile update suggestions.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- show feedback state on detail pages - *Added current feedback badges and active button states for liked/disliked/note visibility.*
+- add feedback history rendering - *Added recent feedback event history on recipe and suggestion detail screens.*
+- add profile suggestion history sections - *Added applied/rejected profile update history sections on `/profile` with route/repository support.*
+- expand tests and uat checklist - *Added route tests and updated Phase 6 checklist with Phase 6.1 visibility checks.*
+---
+<br>
+
 ## Session 7
 ### Friday October 9th
 <br>
