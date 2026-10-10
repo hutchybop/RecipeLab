@@ -14,19 +14,82 @@ from ..repositories import (
     SuggestionsRepository,
 )
 
-_TOKEN_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z\-]{2,}")
-_STOPWORDS = {
+_TOKEN_PATTERN = re.compile(r"[a-z]+")
+_INGREDIENT_MODIFIERS = {
+    "about",
+    "boneless",
+    "chopped",
+    "cored",
+    "crushed",
+    "diced",
+    "divided",
+    "drained",
+    "finely",
     "fresh",
+    "halved",
     "large",
-    "small",
-    "taste",
+    "medium",
+    "minced",
     "optional",
+    "peeled",
+    "quartered",
+    "rinsed",
+    "roughly",
+    "small",
+    "seeded",
+    "skinless",
+    "sliced",
+    "thin",
+    "thick",
+    "thickly",
+    "thinly",
+    "trimmed",
+    "toasted",
+    "warmed",
+    "grated",
+    "shredded",
+    "melted",
+    "softened",
+    "cooked",
+    "uncooked",
+    "removed",
+    "discarded",
+    "reserved",
+    "taste",
     "minutes",
     "minute",
     "tablespoon",
+    "tablespoons",
     "teaspoon",
+    "teaspoons",
     "cups",
     "cup",
+    "clove",
+    "cloves",
+    "piece",
+    "pieces",
+    "pinch",
+    "of",
+    "and",
+    "as",
+    "needed",
+    "for",
+    "serving",
+    "garnish",
+}
+_NON_SPECIFIC_PHRASES = {
+    "black",
+    "brown",
+    "dark",
+    "green",
+    "light",
+    "orange",
+    "purple",
+    "red",
+    "white",
+    "yellow",
+    "thin",
+    "thick",
 }
 
 
@@ -87,50 +150,49 @@ def generate_profile_update_suggestions(
         else:
             disliked_counts.update(tokens)
 
-    existing_pending = {
-        (item.get("action"), item.get("token"))
-        for item in profile_updates_repo.list_pending(limit=500)
+    likes = {_normalize_phrase(item) for item in active_profile.get("likes", [])}
+    dislikes = {_normalize_phrase(item) for item in active_profile.get("dislikes", [])}
+    hard_avoids = {
+        _normalize_phrase(item) for item in active_profile.get("hard_avoids", [])
     }
-    likes = {str(item).lower() for item in active_profile.get("likes", [])}
-    dislikes = {str(item).lower() for item in active_profile.get("dislikes", [])}
-    hard_avoids = {str(item).lower() for item in active_profile.get("hard_avoids", [])}
 
-    created = 0
+    candidates: dict[tuple[str, str], int] = {}
     for token, count in liked_counts.items():
         if count < min_support:
             continue
         if token in likes or token in dislikes or token in hard_avoids:
             continue
-        key = ("add_like", token)
-        if key in existing_pending:
-            continue
-        profile_updates_repo.create(
-            {
-                "action": "add_like",
-                "token": token,
-                "support_count": count,
-                "status": "pending",
-                "notes": f"Observed in {count} liked feedback events.",
-            }
-        )
-        existing_pending.add(key)
-        created += 1
+        candidates[("add_like", token)] = count
 
     for token, count in disliked_counts.items():
         if count < min_support:
             continue
         if token in dislikes or token in likes or token in hard_avoids:
             continue
-        key = ("add_dislike", token)
+        candidates[("add_dislike", token)] = count
+
+    existing_pending = set()
+    for item in profile_updates_repo.list_pending(limit=500):
+        key = (item.get("action"), _normalize_phrase(item.get("token", "")))
+        if key in candidates:
+            existing_pending.add(key)
+        else:
+            # A refresh replaces stale proposals, including one-word candidates
+            # created by the previous ingredient tokenizer.
+            profile_updates_repo.update_status(item.get("_id"), "rejected")
+
+    created = 0
+    for (action, token), count in candidates.items():
+        key = (action, token)
         if key in existing_pending:
             continue
         profile_updates_repo.create(
             {
-                "action": "add_dislike",
+                "action": action,
                 "token": token,
                 "support_count": count,
                 "status": "pending",
-                "notes": f"Observed in {count} disliked feedback events.",
+                "notes": f"Observed in {count} {action.removeprefix('add_')} feedback events.",
             }
         )
         existing_pending.add(key)
@@ -163,7 +225,7 @@ def apply_profile_update_suggestion(
         "notes": "",
         "weights": {},
     }
-    token = str(suggestion.get("token", "")).strip().lower()
+    token = _normalize_phrase(suggestion.get("token", ""))
     action = suggestion.get("action")
 
     likes = [
@@ -178,16 +240,20 @@ def apply_profile_update_suggestion(
         if str(item).strip()
     ]
 
-    if action == "add_like" and token and token not in {item.lower() for item in likes}:
+    if (
+        action == "add_like"
+        and token
+        and token not in {_normalize_phrase(item) for item in likes}
+    ):
         likes.append(token)
-        dislikes = [item for item in dislikes if item.lower() != token]
+        dislikes = [item for item in dislikes if _normalize_phrase(item) != token]
     elif (
         action == "add_dislike"
         and token
-        and token not in {item.lower() for item in hard_avoids}
+        and token not in {_normalize_phrase(item) for item in hard_avoids}
     ):
         dislikes.append(token)
-        likes = [item for item in likes if item.lower() != token]
+        likes = [item for item in likes if _normalize_phrase(item) != token]
     else:
         return False, "No applicable change"
 
@@ -237,8 +303,8 @@ def _extract_tokens(recipe: dict[str, Any]) -> set[str]:
     metadata = recipe.get("metadata", {}) if isinstance(recipe, dict) else {}
 
     for tag in metadata.get("tags", []) if isinstance(metadata, dict) else []:
-        clean = str(tag).strip().lower()
-        if clean and clean not in _STOPWORDS:
+        clean = _normalize_phrase(tag)
+        if _is_useful_phrase(clean):
             tokens.add(clean)
 
     for ingredient in recipe.get("ingredients", []) if isinstance(recipe, dict) else []:
@@ -247,9 +313,28 @@ def _extract_tokens(recipe: dict[str, Any]) -> set[str]:
             name = str(ingredient.get("ingredient", ""))
         elif isinstance(ingredient, str):
             name = ingredient
-        for match in _TOKEN_PATTERN.findall(name.lower()):
-            token = match.strip()
-            if token and token not in _STOPWORDS:
-                tokens.add(token)
+        clean = _normalize_ingredient_phrase(name)
+        if _is_useful_phrase(clean):
+            tokens.add(clean)
 
     return tokens
+
+
+def _normalize_ingredient_phrase(value: Any) -> str:
+    """Keep ingredient context while removing amounts and preparation wording."""
+    text = str(value).lower()
+    text = re.sub(r"\([^)]*\)", " ", text)
+    # Preparation notes are commonly separated from the ingredient by commas.
+    text = re.split(r"[,;]", text, maxsplit=1)[0]
+    words = _TOKEN_PATTERN.findall(text)
+    words = [word for word in words if word not in _INGREDIENT_MODIFIERS]
+    return " ".join(words)
+
+
+def _normalize_phrase(value: Any) -> str:
+    words = _TOKEN_PATTERN.findall(str(value).lower())
+    return " ".join(words)
+
+
+def _is_useful_phrase(phrase: str) -> bool:
+    return bool(phrase and phrase not in _NON_SPECIFIC_PHRASES)

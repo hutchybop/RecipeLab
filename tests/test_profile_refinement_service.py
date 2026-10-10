@@ -6,6 +6,7 @@ from app.services.profile_refinement_service import (
     apply_profile_update_suggestion,
     generate_profile_update_suggestions,
     reject_profile_update_suggestion,
+    _extract_tokens,
 )
 
 from tests.fakes import FakeDatabase
@@ -39,6 +40,17 @@ class ProfileRefinementServiceTests(unittest.TestCase):
                 ],
             }
         )
+        self.db["recipes"].docs.append(
+            {
+                "_id": "r2",
+                "title": "Chicken and Rice",
+                "metadata": {"tags": ["spicy"]},
+                "ingredients": [
+                    {"quantity": "1", "unit": "lb", "ingredient": "chicken breast"},
+                    {"quantity": "1", "unit": "cup", "ingredient": "rice"},
+                ],
+            }
+        )
         self.db["feedback_events"].docs.extend(
             [
                 {
@@ -54,6 +66,13 @@ class ProfileRefinementServiceTests(unittest.TestCase):
                     "target_id": "r1",
                     "signal": "liked",
                     "created_at": 1,
+                },
+                {
+                    "_id": "f3",
+                    "target_type": "recipe",
+                    "target_id": "r2",
+                    "signal": "liked",
+                    "created_at": 0,
                 },
             ]
         )
@@ -136,8 +155,82 @@ class ProfileRefinementServiceTests(unittest.TestCase):
             (item["action"], item["token"])
             for item in self.db["profile_update_suggestions"].docs
         }
-        self.assertIn(("add_like", "chicken"), actions)
-        self.assertNotIn(("add_dislike", "chicken"), actions)
+        self.assertIn(("add_like", "chicken breast"), actions)
+        self.assertNotIn(("add_dislike", "chicken breast"), actions)
+
+    def test_extract_tokens_preserves_ingredient_phrases_and_removes_prep_noise(self):
+        tokens = _extract_tokens(
+            {
+                "metadata": {"tags": ["brown-rice"]},
+                "ingredients": [
+                    {"ingredient": "brown rice"},
+                    {"ingredient": "dark chocolate, melted"},
+                    {"ingredient": "thin steaks, chopped"},
+                    {"ingredient": "red onion, skin removed"},
+                ],
+            }
+        )
+
+        self.assertEqual(
+            tokens,
+            {"brown rice", "dark chocolate", "steaks", "red onion"},
+        )
+
+    def test_refresh_rejects_obsolete_single_word_suggestions(self):
+        for recipe_id in ("r1", "r2"):
+            self.db["recipes"].docs.append(
+                {
+                    "_id": recipe_id,
+                    "title": "Brown Rice Bowl",
+                    "metadata": {"tags": []},
+                    "ingredients": [{"ingredient": "brown rice"}],
+                }
+            )
+            self.db["feedback_events"].docs.append(
+                {
+                    "_id": f"f-{recipe_id}",
+                    "target_type": "recipe",
+                    "target_id": recipe_id,
+                    "signal": "liked",
+                    "created_at": 1,
+                }
+            )
+
+        self.db["profile_update_suggestions"].docs.extend(
+            [
+                {
+                    "_id": "old-brown",
+                    "action": "add_like",
+                    "token": "brown",
+                    "support_count": 2,
+                    "status": "pending",
+                    "created_at": 1,
+                },
+                {
+                    "_id": "old-rice",
+                    "action": "add_like",
+                    "token": "rice",
+                    "support_count": 2,
+                    "status": "pending",
+                    "created_at": 2,
+                },
+            ]
+        )
+
+        generate_profile_update_suggestions(self.db, min_support=2)
+
+        suggestions = self.db["profile_update_suggestions"].docs
+        pending = {
+            item["token"] for item in suggestions if item.get("status") == "pending"
+        }
+        self.assertEqual(pending, {"brown rice"})
+        self.assertTrue(
+            all(
+                item.get("status") == "rejected"
+                for item in suggestions
+                if item["token"] in {"brown", "rice"}
+            )
+        )
 
 
 if __name__ == "__main__":

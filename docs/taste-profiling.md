@@ -57,11 +57,12 @@ Code path:
 
 ### How weighting works in this stage
 
-This stage uses **support count** (frequency) per token:
+This stage uses **support count** (frequency) per preference phrase:
 
-- Tokens are extracted from recipe tags + ingredient names.
-- For each liked/disliked event, token counts increment.
-- Only tokens with `support_count >= min_support` are suggested (`min_support` default is `2`).
+- Candidates are extracted from recipe tags and normalized ingredient names. Ingredient phrases stay together (for example, `brown rice` rather than separate `brown` and `rice` candidates); preparation-only words such as `chopped` and `removed` are ignored.
+- For each liked/disliked event, each distinct candidate phrase in that recipe counts once.
+- Only phrases with `support_count >= min_support` are suggested (`min_support` default is `2`).
+- Generating suggestions again replaces pending items that are no longer supported, so stale suggestions from older extraction logic are cleared from the pending list.
 - Existing likes/dislikes/hard_avoids are excluded from new suggestions.
 
 Then you decide:
