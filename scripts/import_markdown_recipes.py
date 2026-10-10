@@ -22,11 +22,35 @@ def parse_args() -> argparse.Namespace:
         "--recipes-dir", default="recipes", help="Path to markdown recipes directory"
     )
     parser.add_argument(
+        "--exclude-dir",
+        action="append",
+        default=[],
+        help=(
+            "Directory under --recipes-dir to skip (repeatable), "
+            'for example: --exclude-dir "AI-suggested"'
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Parse and validate without writing to MongoDB",
     )
     return parser.parse_args()
+
+
+def should_exclude(
+    recipe_file: Path, recipes_root: Path, excluded_dirs: list[str]
+) -> bool:
+    relative_path = recipe_file.relative_to(recipes_root).as_posix().lower()
+
+    for excluded in excluded_dirs:
+        normalized = excluded.strip().replace("\\", "/").strip("/").lower()
+        if not normalized:
+            continue
+        if relative_path == normalized or relative_path.startswith(f"{normalized}/"):
+            return True
+
+    return False
 
 
 def parse_frontmatter(lines: list[str]) -> tuple[dict[str, Any], int]:
@@ -128,6 +152,11 @@ def main() -> int:
 
     recipes_root = Path(args.recipes_dir).resolve()
     recipe_files = sorted(recipes_root.rglob("*.md"))
+    recipe_files = [
+        recipe_file
+        for recipe_file in recipe_files
+        if not should_exclude(recipe_file, recipes_root, args.exclude_dir)
+    ]
 
     if args.dry_run:
         repository = None
