@@ -1,3 +1,18 @@
+## Session 16
+### Saturday October 10th
+<br>
+
+**Summary:** This session refined feedback handling for recipes and suggestions by allowing users to clear reactions and delete notes, while ensuring only the latest reaction per target influences profile refinement. Repository, service, and web route tests were added to cover the updated behavior.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+bfcd83b
+
+**Session git history:**
+- update recipe feedback logic 20261010-1854 - *Added reaction/note clearing actions, made profile refinement use only the latest reaction for each target, and expanded related tests.*
+---
+<br>
+
 ## Session 15
 ### Saturday October 10th
 <br>
