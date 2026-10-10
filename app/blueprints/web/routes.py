@@ -8,6 +8,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    send_from_directory,
     url_for,
 )
 
@@ -36,6 +37,21 @@ from ...services import (
 
 
 web_bp = Blueprint("web", __name__)
+
+
+@web_bp.get("/favicon.ico")
+def favicon():
+    return send_from_directory(current_app.static_folder, "favicon/favicon.ico")
+
+
+@web_bp.get("/site.webmanifest")
+def webmanifest():
+    return send_from_directory(current_app.static_folder, "favicon/site.webmanifest")
+
+
+@web_bp.get("/browserconfig.xml")
+def browserconfig():
+    return send_from_directory(current_app.static_folder, "favicon/browserconfig.xml")
 
 
 @web_bp.get("/")

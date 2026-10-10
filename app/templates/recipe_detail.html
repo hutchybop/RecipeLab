@@ -5,7 +5,7 @@
 {% block content %}
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">{{ recipe.get('title', 'Untitled recipe') }}</h1>
-    <span class="badge {% if recipe.get('source_type') == 'ai' %}bg-primary{% else %}bg-secondary{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
+    <span class="badge recipe-source-badge {% if recipe.get('source_type') == 'ai' %}recipe-source-badge--ai{% else %}recipe-source-badge--user{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
   </div>
 
   {% set metadata = recipe.get('metadata', {}) %}
