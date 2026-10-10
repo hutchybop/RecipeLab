@@ -1,12 +1,21 @@
 # RecipeLab
 
-RecipeLab is a Flask + MongoDB app for managing a personal recipe library, importing markdown recipes, and generating recipe suggestions with an LLM.
+RecipeLab is an **AI-powered recipe studio**: it helps you turn your existing recipe library and tasting profile into smarter, personalized recipe suggestions.
+
+Import what you already cook, define what you like (and hard avoids), then generate recipes aligned to your preferences.
+
+## Why RecipeLab
+
+- **Personalized AI generation** based on your active tasting profile
+- **Library-first workflow**: keep and improve your own recipe collection
+- **Feedback loop**: likes/dislikes on recipes and suggestions can drive profile refinements
+- **Practical output**: normalized ingredients + clear methods, ready to save/edit/export
 
 ## Features
 
 - Recipe dashboard and browser (`/`, `/recipes`)
 - Recipe CRUD flows (view, edit, soft-delete)
-- AI suggestion generation (`/generate`, `POST /api/generate`)
+- AI suggestion generation (`/generate`, `POST /api/generate`) with profile-aware prompts
 - Raw recipe conversion/import flow (`/import`)
 - Suggestion review workflow (draft / draft_invalid / accepted / rejected)
 - Profile preferences and profile update suggestions (`/profile`)
@@ -70,6 +79,35 @@ Notes:
 - `MONGO_DB_NAME` defaults to `recipelab` if not set.
 - LLM features require provider/model vars (`LLM_PROVIDER`, `LLM_MODEL`, optional `LLM_ALLOWED_MODELS`, etc.).
 
+## AI Setup (Recommended)
+
+RecipeLab’s core value is AI-generated recipes tailored to your profile. Configure these in `.env`:
+
+```env
+LLM_PROVIDER=openai_compatible
+LLM_ENDPOINT=https://opencode.ai/zen/v1
+LLM_API_KEY=your_api_key_here
+LLM_MODEL=gpt-5.4
+LLM_ALLOWED_MODELS=gpt-5.4,deepseek-v4.1-flash
+```
+
+Then:
+
+1. Start the app and open `/settings` to confirm/select the runtime model.
+2. Open `/profile` and set likes, dislikes, hard avoids, and notes.
+3. (Optional) Import your recipe markdown library into MongoDB so your collection is in-app:
+
+   ```bash
+   python scripts/import_markdown_recipes.py
+   ```
+
+4. Generate from `/generate` (or `POST /api/generate`).
+
+> Notes:
+>
+> - Generation uses your **active tasting profile** + instructions.
+> - Your recipe library, suggestions, and feedback history support ongoing refinement workflows in-app.
+
 ## Run Locally
 
 ```bash
@@ -93,6 +131,14 @@ Serves on `http://localhost:3009` (`3009:3009` in compose, env loaded from `.env
 
 ```bash
 curl -i http://localhost:3009/api/health
+```
+
+Quick AI check:
+
+```bash
+curl -i http://localhost:3009/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"meal_type":"main","instructions":"high-protein dinner under 40 minutes"}'
 ```
 
 ## API

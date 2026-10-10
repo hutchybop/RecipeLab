@@ -22,7 +22,10 @@
   <body class="app-body">
     <nav class="navbar navbar-expand-lg app-navbar border-bottom mb-4">
       <div class="container">
-        <a class="navbar-brand fw-semibold" href="{{ url_for('web.index') }}">RecipeLab</a>
+        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{{ url_for('web.index') }}">
+          <img src="{{ url_for('static', filename='favicon/favicon-32x32.png') }}" alt="RecipeLab icon" width="30" height="30" />
+          <span>RecipeLab</span>
+        </a>
         <div class="navbar-nav">
           <a class="nav-link" href="{{ url_for('web.generate_page') }}">Generate</a>
           <a class="nav-link" href="{{ url_for('web.import_recipe_page') }}">Import</a>
