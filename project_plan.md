@@ -947,6 +947,29 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-10 (Web UI Phase 3 Validation Gate)
+
+- Phase: Web UI Phase 3 / UX Polish, Accessibility, and Cross-Device Consistency
+- Status: `complete`
+- What changed:
+  - User completed final responsive and accessibility QA pass using `docs/checklists/phase-11-uat.md`.
+  - Final project documentation sweep completed (`README.md`, `docs/`, and project plan entries) to align with shipped responsive/accessibility behavior.
+- Tests run:
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+  - `.venv/bin/python -m black --check .`
+  - `.venv/bin/python -m flake8 .`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Promote Web UI Phase 3 to `complete`.
+- Next actions:
+  - Maintain checklist-driven QA for future UI changes.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -986,3 +1009,5 @@ Use this template for each checkpoint entry:
 - Implemented Web UI Phase 2 layout responsiveness updates across key templates and added Phase 10 UAT checklist for manual validation.
 - Web UI Phase 2 validation gate passed and phase promoted to complete.
 - Implemented Web UI Phase 3 accessibility and consistency polish updates; added Phase 11 final QA checklist.
+- Web UI Phase 3 validation gate passed; responsive/accessibility improvement track is complete.
+- Performed final docs alignment sweep across `project_plan.md`, `README.md`, and `docs/` references.

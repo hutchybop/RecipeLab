@@ -21,6 +21,8 @@ Import what you already cook, define what you like (and hard avoids), then gener
 - Profile preferences and profile update suggestions (`/profile`)
 - Runtime model selection (`/settings`)
 - PDF export for recipes (`/recipes/<id>/pdf`)
+- Responsive web UI for phone/tablet/laptop/desktop screen sizes
+- Accessibility polish: skip-link navigation, clear keyboard focus states, and active-nav orientation
 - Health endpoint (`GET /api/health`)
 
 ## Tech Stack
@@ -195,6 +197,8 @@ Run all tests:
 ```bash
 python -m unittest discover -s tests
 ```
+
+Manual UAT checklists are in `docs/checklists/` (including responsive UI validation checklists for phases 9, 10, and 11).
 
 ## Lint / Format
 

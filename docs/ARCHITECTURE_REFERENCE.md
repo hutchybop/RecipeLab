@@ -7,6 +7,7 @@ RecipeLab is a Flask + MongoDB application for managing a recipe library and gen
 At a high level, it provides:
 
 - **Web UI** for browsing, editing, importing, generating, and exporting recipes.
+- **Responsive + accessible UI layer** (Bootstrap + custom dark theme) with mobile-first navigation/actions, keyboard skip-link support, and focus-visible styling.
 - **API endpoints** for health checks and recipe generation.
 - **Service layer** for LLM orchestration, prompt construction, schema normalization, PDF export, and profile refinement.
 - **Repository layer** for MongoDB persistence and index management.
@@ -134,8 +135,8 @@ flowchart LR
 
 | Path | Purpose | Key responsibilities | Main exports / entrypoints |
 |---|---|---|---|
-| `app/templates/*.html` | Server-rendered UI | Dashboard, generation/import forms, recipe/suggestion detail/edit, settings/profile | Jinja templates used by web routes |
-| `app/static/` | Static assets | Theme CSS + favicon/webmanifest/browserconfig assets | N/A |
+| `app/templates/*.html` | Server-rendered UI | Dashboard, generation/import forms, recipe/suggestion detail/edit, settings/profile, responsive page-header/action-row patterns | Jinja templates used by web routes |
+| `app/static/` | Static assets | Theme CSS (responsive helpers, dark theme, focus styles, mobile touch sizing) + favicon/webmanifest/browserconfig assets | N/A |
 | `recipes/` | Recipe markdown corpus | User and AI-suggested source recipes | N/A |
 | `prompts/*.md` | Prompt references | Canonical formatting and suggestion prompt guidance | N/A |
 | `scripts/import_markdown_recipes.py` | CLI import utility | Parse markdown recipes, infer meal/source type, upsert to MongoDB | `main()` CLI |

@@ -4,6 +4,7 @@
 - This repo is both a Flask app and a recipe markdown library; do not assume markdown-only.
 - GitHub Actions Docker release workflow exists at `.github/workflows/docker-release.yml`.
 - Lint/format config is defined in `.flake8` (flake8) and `pyproject.toml` (black).
+- Responsive UI validation checklists are in `docs/checklists/phase-9-uat.md`, `phase-10-uat.md`, and `phase-11-uat.md`.
 
 ## Setup and Run
 - Create env and install deps: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && pip install -r requirements-dev.txt`
@@ -23,6 +24,7 @@
 - `app/extensions.py` creates/stores `MongoClient` and DB handle in `app.extensions`.
 - `app/blueprints/web/routes.py` serves the web UI (`/` dashboard, `/recipes`, `/suggestions`, `/generate`, `/import`, `/profile`, `/settings`, edit/delete flows, PDF export).
 - `/` renders `app/templates/dashboard.html`.
+- `app/templates/base.html` contains global responsive navigation + accessibility anchors (skip link, active nav states).
 - `app/blueprints/api/routes.py` exposes `GET /api/health` and `POST /api/generate`.
 - `app/services/generation_service.py` handles LLM generation/conversion and writes generation runs + suggestions.
 - `app/repositories/*` contains MongoDB repositories and index management (`ensure_all_indexes`).
