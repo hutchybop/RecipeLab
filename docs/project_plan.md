@@ -970,6 +970,29 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-10 (Project File Move Compatibility)
+
+- Phase: Documentation and Repository Hygiene
+- Status: `complete`
+- What changed:
+  - Confirmed repo path moves: `project_plan.md` -> `docs/project_plan.md`, `tasting-profile.md` -> `recipes/tasting-profile.md`.
+  - Updated markdown importer to automatically exclude `recipes/tasting-profile.md` and perform dry-run validation checks.
+  - Updated documentation references to the new tasting profile location.
+- Tests run:
+  - `.venv/bin/python scripts/import_markdown_recipes.py --dry-run`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py scripts`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Keep `recipes/tasting-profile.md` in-repo for reference while excluding it from recipe import.
+- Next actions:
+  - Continue treating non-recipe markdown files in `recipes/` as import-excluded artifacts unless explicitly added to ingestion scope.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -1010,4 +1033,5 @@ Use this template for each checkpoint entry:
 - Web UI Phase 2 validation gate passed and phase promoted to complete.
 - Implemented Web UI Phase 3 accessibility and consistency polish updates; added Phase 11 final QA checklist.
 - Web UI Phase 3 validation gate passed; responsive/accessibility improvement track is complete.
-- Performed final docs alignment sweep across `project_plan.md`, `README.md`, and `docs/` references.
+- Performed final docs alignment sweep across `docs/project_plan.md`, `README.md`, and `docs/` references.
+- Confirmed compatibility after moving planning/profile files and hardened importer behavior for `recipes/tasting-profile.md`.

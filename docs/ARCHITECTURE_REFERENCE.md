@@ -139,7 +139,7 @@ flowchart LR
 | `app/static/` | Static assets | Theme CSS (responsive helpers, dark theme, focus styles, mobile touch sizing) + favicon/webmanifest/browserconfig assets | N/A |
 | `recipes/` | Recipe markdown corpus | User and AI-suggested source recipes | N/A |
 | `prompts/*.md` | Prompt references | Canonical formatting and suggestion prompt guidance | N/A |
-| `scripts/import_markdown_recipes.py` | CLI import utility | Parse markdown recipes, infer meal/source type, upsert to MongoDB | `main()` CLI |
+| `scripts/import_markdown_recipes.py` | CLI import utility | Parse markdown recipes, infer meal/source type, validate payloads in dry-run mode, upsert to MongoDB (auto-excludes `recipes/tasting-profile.md`) | `main()` CLI |
 | `tests/*.py` | Automated tests | Coverage for schema utils, repos/indexes, services, API/web routes, runtime settings | `unittest` test cases |
 | `tests/fakes.py` | Test doubles | In-memory fake DB/collections/cursor/update behavior | `FakeDatabase`, `FakeCollection`, etc. |
 | `docs/` | Project docs | Runbooks, checklists, logs, agent instructions | N/A |

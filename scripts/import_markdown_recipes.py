@@ -14,6 +14,9 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from app.config import AppConfig
 from app.repositories import RecipesRepository, ensure_all_indexes
+from app.services.schema_utils import normalize_recipe_document
+
+DEFAULT_EXCLUDED_FILES = {"tasting-profile.md"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -42,6 +45,9 @@ def should_exclude(
     recipe_file: Path, recipes_root: Path, excluded_dirs: list[str]
 ) -> bool:
     relative_path = recipe_file.relative_to(recipes_root).as_posix().lower()
+
+    if relative_path in DEFAULT_EXCLUDED_FILES:
+        return True
 
     for excluded in excluded_dirs:
         normalized = excluded.strip().replace("\\", "/").strip("/").lower()
@@ -177,6 +183,9 @@ def main() -> int:
             repository.upsert_by_source_path(
                 source_path=source_path, document=recipe_payload
             )
+        else:
+            # Validate payload shape in dry-run mode without writing to MongoDB.
+            normalize_recipe_document({**recipe_payload, "source_path": source_path})
 
         imported_count += 1
 

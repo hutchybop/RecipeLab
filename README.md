@@ -190,6 +190,10 @@ Useful flags:
 - `--exclude-dir "AI-suggested"` (repeatable)
 - `--dry-run`
 
+Notes:
+
+- `recipes/tasting-profile.md` is automatically excluded by the importer.
+
 ## Tests
 
 Run all tests:
@@ -199,6 +203,10 @@ python -m unittest discover -s tests
 ```
 
 Manual UAT checklists are in `docs/checklists/` (including responsive UI validation checklists for phases 9, 10, and 11).
+
+## Additional Guides
+
+- Taste profiling and influence weights: `docs/taste-profiling.md`
 
 ## Lint / Format
 

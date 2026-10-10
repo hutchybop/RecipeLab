@@ -1,8 +1,25 @@
+## Session 15
+### Saturday October 10th
+<br>
+
+**Summary:** This session verified repository file moves and hardened import compatibility. It confirmed that moving `project_plan.md` into `docs/` and `tasting-profile.md` into `recipes/` does not break runtime flow, then updated the markdown importer to auto-exclude the tasting profile file and validate dry-run payloads.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+pending
+
+**Session git history:**
+- verify moved file compatibility - *Checked code/docs references after moving project plan and tasting profile files to new locations.*
+- harden importer for tasting-profile - *Updated `scripts/import_markdown_recipes.py` to auto-exclude `recipes/tasting-profile.md` and validate dry-run payloads.*
+- update docs for new paths - *Updated AGENTS/README/project plan references and logged final compatibility status.*
+---
+<br>
+
 ## Session 14
 ### Saturday October 10th
 <br>
 
-**Summary:** This session completed the final Web UI responsiveness/accessibility validation pass and closed the documentation loop. It confirmed full automated quality gates, finalized Web UI Phase 3 status, and aligned project docs (`project_plan.md`, `README.md`, and architecture/agent references) with the shipped responsive behavior.
+**Summary:** This session completed the final Web UI responsiveness/accessibility validation pass and closed the documentation loop. It confirmed full automated quality gates, finalized Web UI Phase 3 status, and aligned project docs (`docs/project_plan.md`, `README.md`, and architecture/agent references) with the shipped responsive behavior.
 
 **Git Branch:** main <br>
 **Git commits:** <br>
@@ -79,7 +96,7 @@ pending
 - add settings page UX - *Added `/settings` page with model allow-list selection and read-only provider/endpoint display.*
 - add recipe pdf export - *Added `/recipes/<id>/pdf` route and simple PDF rendering service with export action button.*
 - expand phase 7 tests and checklist - *Added route/repository/runtime-model tests and created `docs/checklists/phase-7-uat.md`.*
-- phase 7 validation complete - *User passed Phase 7 UAT; phase promoted to complete in `project_plan.md`.*
+- phase 7 validation complete - *User passed Phase 7 UAT; phase promoted to complete in `docs/project_plan.md`.*
 ---
 <br>
 

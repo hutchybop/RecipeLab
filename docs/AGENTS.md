@@ -5,6 +5,7 @@
 - GitHub Actions Docker release workflow exists at `.github/workflows/docker-release.yml`.
 - Lint/format config is defined in `.flake8` (flake8) and `pyproject.toml` (black).
 - Responsive UI validation checklists are in `docs/checklists/phase-9-uat.md`, `phase-10-uat.md`, and `phase-11-uat.md`.
+- Taste profiling behavior/weighting guide is in `docs/taste-profiling.md`.
 
 ## Setup and Run
 - Create env and install deps: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && pip install -r requirements-dev.txt`
@@ -36,4 +37,4 @@
 - Keep canonical sections/frontmatter (`title`, `source`, `servings`, `prep_time`, `cook_time`, `rating`, `difficulty`, `tags`, then `## Ingredients`, `## Method`, optional `## Notes`).
 - Do not invent missing metadata; leave fields empty.
 - Normalize ingredients as quantity + unit + ingredient; use `Method` (not `Preparation Steps`).
-- Respect hard avoids from `tasting-profile.md`: whole chickpeas, peanuts, sprouts, cauliflower, cinnamon.
+- Respect hard avoids from `recipes/tasting-profile.md`: whole chickpeas, peanuts, sprouts, cauliflower, cinnamon.

@@ -27,7 +27,7 @@ context: - dessert - lunch / weekday (batch) - lunch / weekend - main
 This library represents the user's actual behaviour, not aspirational
 cooking.
 
-Your task is to generate or edit a `tasting-profile.md` document that can be
+Your task is to generate or edit a `recipes/tasting-profile.md` document that can be
 used to reliably filter and rank new recipe suggestions for this
 specific user.
 
@@ -76,7 +76,7 @@ profile document.
 
 ## Output Format
 
-Produce (or edit) a single Markdown file named `tasting-profile.md` with the
+Produce (or edit) a single Markdown file at `recipes/tasting-profile.md` with the
 following sections:
 
 1.  Core Taste Preferences (Global)
