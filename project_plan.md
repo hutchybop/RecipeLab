@@ -514,7 +514,7 @@ Update this file at every checkpoint.
 ### Web UI Responsiveness Status Tracker
 - Web UI Phase 1: `complete`
 - Web UI Phase 2: `complete`
-- Web UI Phase 3: `not_started`
+- Web UI Phase 3: `complete`
 
 ### Checkpoint Log Template
 
@@ -899,6 +899,54 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-10 (Web UI Phase 2 Validation Gate)
+
+- Phase: Web UI Phase 2 / Page Layout Responsiveness (Headers, Actions, Forms)
+- Status: `complete`
+- What changed:
+  - User validated the responsive layout update set and confirmed successful regression tests.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Promote Web UI Phase 2 to `complete` and proceed to final Web UI Phase 3.
+- Next actions:
+  - Implement accessibility and consistency polish items for Web UI Phase 3.
+
+---
+
+## Checkpoint 2026-10-10 (Web UI Phase 3 Implementation)
+
+- Phase: Web UI Phase 3 / UX Polish, Accessibility, and Cross-Device Consistency
+- Status: `in_progress`
+- What changed:
+  - Added skip-link support for keyboard users and main-content target id.
+  - Added active top-navigation highlighting with `aria-current` for route orientation.
+  - Added cross-component `:focus-visible` styling improvements for better keyboard focus discoverability.
+  - Tuned mobile touch ergonomics with minimum tap-target sizing for key controls.
+  - Improved small-screen consistency with typography and spacing adjustments.
+  - Added mobile-nav quality-of-life behavior to auto-collapse the menu after link selection.
+  - Added final manual QA checklist: `docs/checklists/phase-11-uat.md`.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes -v`
+  - `.venv/bin/python -m unittest discover -s tests -v`
+  - `.venv/bin/python -m compileall app tests run.py`
+- User validation outcome:
+  - Pending final cross-device QA pass.
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Keep Web UI Phase 3 `in_progress` until final manual checklist sign-off.
+- Next actions:
+  - Run `docs/checklists/phase-11-uat.md` and confirm validation gate outcome.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -936,3 +984,5 @@ Use this template for each checkpoint entry:
 - Added post-MVP Web UI responsiveness phases (Web UI Phase 1/2/3) to the project plan.
 - Completed Web UI Phase 1 (mobile navbar foundation), including manual checklist creation and user validation pass.
 - Implemented Web UI Phase 2 layout responsiveness updates across key templates and added Phase 10 UAT checklist for manual validation.
+- Web UI Phase 2 validation gate passed and phase promoted to complete.
+- Implemented Web UI Phase 3 accessibility and consistency polish updates; added Phase 11 final QA checklist.

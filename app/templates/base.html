@@ -20,6 +20,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-dark.css') }}" />
   </head>
   <body class="app-body">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    {% set endpoint = request.endpoint or '' %}
+    {% set generate_active = endpoint == 'web.generate_page' %}
+    {% set import_active = endpoint == 'web.import_recipe_page' %}
+    {% set suggestions_active = endpoint in ['web.suggestions_page', 'web.suggestion_detail', 'web.edit_suggestion'] %}
+    {% set recipes_active = endpoint in ['web.recipes_page', 'web.recipe_detail', 'web.edit_recipe', 'web.export_recipe_pdf'] %}
+    {% set profile_active = endpoint in ['web.profile_page', 'web.apply_profile_suggestion', 'web.reject_profile_suggestion'] %}
+    {% set settings_active = endpoint == 'web.settings_page' %}
     <nav class="navbar navbar-expand-lg app-navbar border-bottom mb-4">
       <div class="container">
         <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{{ url_for('web.index') }}">
@@ -39,18 +47,18 @@
         </button>
         <div class="collapse navbar-collapse" id="appNavbarNav">
           <div class="navbar-nav ms-auto app-navbar-nav-links">
-            <a class="nav-link" href="{{ url_for('web.generate_page') }}">Generate</a>
-            <a class="nav-link" href="{{ url_for('web.import_recipe_page') }}">Import</a>
-            <a class="nav-link" href="{{ url_for('web.suggestions_page') }}">Suggestions</a>
-            <a class="nav-link" href="{{ url_for('web.recipes_page') }}">Recipe Library</a>
-            <a class="nav-link" href="{{ url_for('web.profile_page') }}">Profile</a>
-            <a class="nav-link" href="{{ url_for('web.settings_page') }}">Settings</a>
+            <a class="nav-link{% if generate_active %} active{% endif %}" href="{{ url_for('web.generate_page') }}" {% if generate_active %}aria-current="page"{% endif %}>Generate</a>
+            <a class="nav-link{% if import_active %} active{% endif %}" href="{{ url_for('web.import_recipe_page') }}" {% if import_active %}aria-current="page"{% endif %}>Import</a>
+            <a class="nav-link{% if suggestions_active %} active{% endif %}" href="{{ url_for('web.suggestions_page') }}" {% if suggestions_active %}aria-current="page"{% endif %}>Suggestions</a>
+            <a class="nav-link{% if recipes_active %} active{% endif %}" href="{{ url_for('web.recipes_page') }}" {% if recipes_active %}aria-current="page"{% endif %}>Recipe Library</a>
+            <a class="nav-link{% if profile_active %} active{% endif %}" href="{{ url_for('web.profile_page') }}" {% if profile_active %}aria-current="page"{% endif %}>Profile</a>
+            <a class="nav-link{% if settings_active %} active{% endif %}" href="{{ url_for('web.settings_page') }}" {% if settings_active %}aria-current="page"{% endif %}>Settings</a>
           </div>
         </div>
       </div>
     </nav>
 
-    <main class="container pb-5">
+    <main class="container pb-5" id="main-content">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -66,5 +74,26 @@
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       crossorigin="anonymous"
     ></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const collapseElement = document.getElementById("appNavbarNav");
+        const toggler = document.querySelector('[data-bs-target="#appNavbarNav"]');
+
+        if (!collapseElement || !toggler || typeof bootstrap === "undefined") {
+          return;
+        }
+
+        collapseElement.querySelectorAll(".nav-link").forEach((link) => {
+          link.addEventListener("click", () => {
+            const isMobileNav = window.getComputedStyle(toggler).display !== "none";
+            if (!isMobileNav) {
+              return;
+            }
+
+            bootstrap.Collapse.getOrCreateInstance(collapseElement).hide();
+          });
+        });
+      });
+    </script>
   </body>
 </html>

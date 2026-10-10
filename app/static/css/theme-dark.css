@@ -11,6 +11,7 @@
   --app-ai-badge: #60a5fa;
   --app-user-badge: #2dd4bf;
   --app-danger: #f87171;
+  --app-focus-ring: rgba(52, 211, 153, 0.45);
 
   --bs-primary: var(--app-accent-primary);
   --bs-success: var(--app-accent-secondary);
@@ -26,6 +27,23 @@
 body.app-body {
   background-color: var(--app-bg);
   color: var(--app-text);
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -100%;
+  z-index: 1100;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: #0b1220;
+  background-color: var(--app-accent-secondary);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0.75rem;
 }
 
 .app-navbar {
@@ -54,6 +72,11 @@ body.app-body {
 .app-navbar .nav-link:focus,
 .app-navbar .nav-link.active {
   color: var(--app-accent-primary);
+}
+
+:where(a, button, .btn, .nav-link, .navbar-toggler, .form-control, .form-select, .list-group-item-action):focus-visible {
+  outline: 2px solid var(--app-focus-ring);
+  outline-offset: 2px;
 }
 
 .page-header {
@@ -110,6 +133,37 @@ body.app-body {
 
   .feedback-note-input {
     max-width: none;
+  }
+
+  .app-navbar .navbar-brand,
+  .app-navbar-nav-links .nav-link,
+  .action-row .btn,
+  .btn-sm,
+  input.form-control,
+  select.form-select {
+    min-height: 44px;
+  }
+
+  .app-navbar-nav-links .nav-link,
+  .action-row .btn {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .card .card-body.p-4 {
+    padding: 1rem !important;
+  }
+
+  .display-6 {
+    font-size: 1.65rem;
+  }
+
+  .h3 {
+    font-size: 1.5rem;
+  }
+
+  .lead {
+    font-size: 1rem;
   }
 }
 
