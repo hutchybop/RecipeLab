@@ -38,10 +38,56 @@ body.app-body {
   color: var(--app-text);
 }
 
+.app-navbar .navbar-toggler {
+  border-color: var(--app-border);
+}
+
+.app-navbar .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.2);
+}
+
+.app-navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28243, 244, 246, 0.95%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 .app-navbar .nav-link:hover,
 .app-navbar .nav-link:focus,
 .app-navbar .nav-link.active {
   color: var(--app-accent-primary);
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.text-wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 991.98px) {
+  .app-navbar-nav-links {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .app-navbar-nav-links .nav-link {
+    padding: 0.625rem 0;
+  }
+
+  .mobile-stack > * {
+    width: 100%;
+  }
 }
 
 .app-panel,

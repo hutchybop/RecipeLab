@@ -354,6 +354,81 @@ Exit Criteria:
 
 ---
 
+## Post-MVP Web UI Responsiveness Plan
+
+These phases are focused on improving usability across laptop/desktop and small mobile screens without changing core business workflows.
+
+### Web UI Phase 1 - Responsive Foundation (Navigation + Global Helpers)
+
+Objective:
+- Fix critical mobile navigation usability and establish shared responsive CSS foundations.
+
+Deliverables:
+- Collapsible mobile navbar (hamburger/toggler) with proper accessibility attributes.
+- Bootstrap JS bundle enabled for navbar collapse behavior.
+- Shared responsive utility classes in theme CSS for upcoming page-level refactors.
+- Dark-theme-compatible toggler styling/focus treatment.
+
+Testing:
+- Mobile manual validation across key routes (`/`, `/recipes`, `/suggestions`, `/generate`, `/import`, `/profile`, `/settings`).
+- Regression checks for desktop/tablet navbar behavior.
+- Route regression test suite.
+
+Validation Gate:
+- User confirms mobile nav is usable and no desktop navbar regressions are introduced.
+
+Exit Criteria:
+- No piled/overlapping top navigation links on iPhone-size screens.
+- Hamburger open/close works consistently across pages.
+
+---
+
+### Web UI Phase 2 - Page Layout Responsiveness (Headers, Actions, Forms)
+
+Objective:
+- Remove small-screen crowding/overflow in page headers, action rows, and form-heavy screens.
+
+Deliverables:
+- Responsive header/action-row patterns applied across recipes/suggestions/detail/profile/settings/generate/import/dashboard templates.
+- Mobile-first stacking behavior for dense button groups and inline controls.
+- Improved wrapping behavior for long titles/labels and content blocks.
+
+Testing:
+- Template route rendering checks.
+- Manual viewport walkthroughs at mobile/tablet/laptop/desktop breakpoints.
+- Regression test suite.
+
+Validation Gate:
+- User can complete primary UI flows on mobile without layout collisions or hidden controls.
+
+Exit Criteria:
+- No major overlap/truncation of primary actions at small widths.
+
+---
+
+### Web UI Phase 3 - UX Polish, Accessibility, and Cross-Device Consistency
+
+Objective:
+- Finalize responsive polish and accessibility for daily use quality.
+
+Deliverables:
+- Tap-target, spacing, and typography tuning for touch devices.
+- Focus/keyboard navigation polish for key interactive controls.
+- Consistent visual behavior across breakpoints and dark theme states.
+- Final responsive QA checklist and remediation pass.
+
+Testing:
+- Manual cross-device pass (e.g., 375x667, 390x844, 768x1024, 1366x768, 1920x1080).
+- Regression tests and compile checks.
+
+Validation Gate:
+- User confirms UI is comfortable and reliable on both mobile and desktop.
+
+Exit Criteria:
+- No blocking responsive/accessibility issues in core flows.
+
+---
+
 ## Testing Strategy (Cross-Phase)
 
 ### Test Layers
@@ -434,7 +509,12 @@ Update this file at every checkpoint.
 - Phase 6: `complete`
 - Phase 6.1: `complete`
 - Phase 7: `complete`
-- Phase 8: `in_progress`
+- Phase 8: `complete`
+
+### Web UI Responsiveness Status Tracker
+- Web UI Phase 1: `complete`
+- Web UI Phase 2: `not_started`
+- Web UI Phase 3: `not_started`
 
 ### Checkpoint Log Template
 
@@ -772,6 +852,29 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-10 (Web UI Phase 1 Validation Gate)
+
+- Phase: Web UI Phase 1 / Responsive Foundation (Navigation + Global Helpers)
+- Status: `complete`
+- What changed:
+  - Converted top navigation to Bootstrap collapsible navbar with mobile hamburger toggler.
+  - Added Bootstrap JS bundle to enable collapse interactions.
+  - Added shared responsive helper classes in dark theme stylesheet for upcoming Phase 2/3 template work.
+  - Added dark-theme navbar toggler styling and focus states.
+  - Added manual UAT checklist: `docs/checklists/phase-9-uat.md`.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes -v`
+- User validation outcome:
+  - `pass`
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Proceed with responsive improvements incrementally (Phase 2 then Phase 3) to reduce regression risk.
+- Next actions:
+  - Start Web UI Phase 2 page-level responsive refactors.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -804,3 +907,7 @@ Use this template for each checkpoint entry:
 
 ### 2026-10-09
 - Phase 8 final preflight completed: ship env verified, Black formatting applied, and Phase 8 UAT/runbook docs added.
+
+### 2026-10-10
+- Added post-MVP Web UI responsiveness phases (Web UI Phase 1/2/3) to the project plan.
+- Completed Web UI Phase 1 (mobile navbar foundation), including manual checklist creation and user validation pass.
