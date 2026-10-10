@@ -66,6 +66,58 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0]["signal"], "liked")
 
+    def test_feedback_events_repository_delete_reactions_and_clear_notes(self):
+        repository = FeedbackEventsRepository(self.db)
+        repository.create(
+            {
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "liked",
+                "notes": "good",
+            }
+        )
+        repository.create(
+            {
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "disliked",
+                "notes": "bad",
+            }
+        )
+        repository.create(
+            {
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "note",
+                "notes": "custom",
+            }
+        )
+
+        deleted = repository.delete_reactions_for_target(
+            target_type="recipe", target_id="r1"
+        )
+        self.assertEqual(deleted, 2)
+        events = repository.list_for_target(target_type="recipe", target_id="r1")
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "note")
+
+        repository.create(
+            {
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "liked",
+                "notes": "keep",
+            }
+        )
+        changed = repository.clear_notes_for_target(
+            target_type="recipe", target_id="r1"
+        )
+        self.assertGreaterEqual(changed, 1)
+        events = repository.list_for_target(target_type="recipe", target_id="r1")
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "liked")
+        self.assertEqual(events[0]["notes"], "")
+
     def test_generation_runs_repository_create_and_update_status(self):
         repository = GenerationRunsRepository(self.db)
         run = repository.create({"meal_type": "main", "model": "gpt-test"})

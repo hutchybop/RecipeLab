@@ -309,6 +309,111 @@ class WebRoutesTests(unittest.TestCase):
         self.assertEqual(len(self.fake_db["feedback_events"].docs), 1)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_feedback_post_replaces_existing_reaction(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["feedback_events"].docs.append(
+            {
+                "_id": "f1",
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "disliked",
+                "notes": "",
+                "created_at": 1,
+            }
+        )
+
+        response = self.client.post(
+            "/feedback",
+            data={
+                "target_type": "recipe",
+                "target_id": "r1",
+                "signal": "liked",
+                "notes": "",
+                "return_to": "/recipes/r1",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        events = self.fake_db["feedback_events"].docs
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "liked")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_clear_feedback_reaction_route(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["feedback_events"].docs.extend(
+            [
+                {
+                    "_id": "f1",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "notes": "",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f2",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "note",
+                    "notes": "keep",
+                    "created_at": 1,
+                },
+            ]
+        )
+
+        response = self.client.post(
+            "/feedback/clear-reaction",
+            data={
+                "target_type": "recipe",
+                "target_id": "r1",
+                "return_to": "/recipes/r1",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        events = self.fake_db["feedback_events"].docs
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "note")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_clear_feedback_note_route(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["feedback_events"].docs.extend(
+            [
+                {
+                    "_id": "f1",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "note",
+                    "notes": "remove me",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f2",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "notes": "also clear",
+                    "created_at": 1,
+                },
+            ]
+        )
+
+        response = self.client.post(
+            "/feedback/clear-note",
+            data={
+                "target_type": "recipe",
+                "target_id": "r1",
+                "return_to": "/recipes/r1",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        events = self.fake_db["feedback_events"].docs
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]["signal"], "liked")
+        self.assertEqual(events[0]["notes"], "")
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
     def test_apply_profile_suggestion_route(self, mock_db):
         mock_db.return_value = self.fake_db
         self.fake_db["preferences"].docs.append(

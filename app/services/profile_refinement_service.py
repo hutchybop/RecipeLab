@@ -53,11 +53,26 @@ def generate_profile_update_suggestions(
     disliked_counts: Counter[str] = Counter()
 
     events = feedback_repo.list_recent(limit=limit)
+    latest_reactions_by_target: list[dict[str, Any]] = []
+    seen_targets: set[tuple[str, str]] = set()
     for event in events:
-        signal = event.get("signal")
+        signal = str(event.get("signal", "")).strip()
         if signal not in {"liked", "disliked"}:
             continue
 
+        target_type = str(event.get("target_type", "")).strip()
+        target_id = str(event.get("target_id", "")).strip()
+        if not target_type or not target_id:
+            continue
+
+        key = (target_type, target_id)
+        if key in seen_targets:
+            continue
+        seen_targets.add(key)
+        latest_reactions_by_target.append(event)
+
+    for event in latest_reactions_by_target:
+        signal = event.get("signal")
         target_recipe = _resolve_target_recipe(
             event=event,
             recipes_repo=recipes_repo,

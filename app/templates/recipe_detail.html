@@ -85,6 +85,20 @@
         <button class="btn w-100 w-sm-auto {% if feedback_state.get('reaction') == 'disliked' %}btn-danger{% else %}btn-outline-danger{% endif %}" type="submit" name="signal" value="disliked">Disliked</button>
         <button class="btn w-100 w-sm-auto {% if feedback_state.get('latest_note') %}btn-secondary{% else %}btn-outline-secondary{% endif %}" type="submit" name="signal" value="note">Add Note</button>
       </form>
+      <div class="action-row mobile-stack mt-2">
+        <form method="post" action="{{ url_for('web.clear_feedback_reaction') }}">
+          <input type="hidden" name="target_type" value="recipe" />
+          <input type="hidden" name="target_id" value="{{ recipe['_id'] }}" />
+          <input type="hidden" name="return_to" value="{{ request.path }}" />
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Clear Reaction</button>
+        </form>
+        <form method="post" action="{{ url_for('web.clear_feedback_note') }}">
+          <input type="hidden" name="target_type" value="recipe" />
+          <input type="hidden" name="target_id" value="{{ recipe['_id'] }}" />
+          <input type="hidden" name="return_to" value="{{ request.path }}" />
+          <button class="btn btn-sm btn-outline-secondary" type="submit">Delete Note</button>
+        </form>
+      </div>
 
       <hr />
       <h3 class="h6">Recent feedback history</h3>

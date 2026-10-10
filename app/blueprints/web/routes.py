@@ -470,7 +470,14 @@ def submit_feedback():
         flash("Invalid feedback signal.", "danger")
         return redirect(return_to)
 
-    FeedbackEventsRepository(get_mongo_db()).create(
+    feedback_repo = FeedbackEventsRepository(get_mongo_db())
+    if signal in {"liked", "disliked"}:
+        feedback_repo.delete_reactions_for_target(
+            target_type=target_type,
+            target_id=target_id,
+        )
+
+    feedback_repo.create(
         {
             "target_type": target_type,
             "target_id": target_id,
@@ -479,6 +486,48 @@ def submit_feedback():
         }
     )
     flash("Feedback saved.", "success")
+    return redirect(return_to)
+
+
+@web_bp.post("/feedback/clear-reaction")
+def clear_feedback_reaction():
+    target_type = str(request.form.get("target_type", "")).strip()
+    target_id = str(request.form.get("target_id", "")).strip()
+    return_to = str(request.form.get("return_to", "")).strip() or url_for("web.index")
+
+    if target_type not in {"recipe", "suggestion"} or not target_id:
+        flash("Invalid feedback target.", "danger")
+        return redirect(return_to)
+
+    deleted = FeedbackEventsRepository(get_mongo_db()).delete_reactions_for_target(
+        target_type=target_type,
+        target_id=target_id,
+    )
+    flash(
+        "Reaction cleared." if deleted else "No reaction to clear.",
+        "info",
+    )
+    return redirect(return_to)
+
+
+@web_bp.post("/feedback/clear-note")
+def clear_feedback_note():
+    target_type = str(request.form.get("target_type", "")).strip()
+    target_id = str(request.form.get("target_id", "")).strip()
+    return_to = str(request.form.get("return_to", "")).strip() or url_for("web.index")
+
+    if target_type not in {"recipe", "suggestion"} or not target_id:
+        flash("Invalid feedback target.", "danger")
+        return redirect(return_to)
+
+    changed = FeedbackEventsRepository(get_mongo_db()).clear_notes_for_target(
+        target_type=target_type,
+        target_id=target_id,
+    )
+    flash(
+        "Note deleted." if changed else "No note to delete.",
+        "info",
+    )
     return redirect(return_to)
 
 

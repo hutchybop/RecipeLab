@@ -37,6 +37,33 @@ class FeedbackEventsRepository:
         normalized["_id"] = result.inserted_id
         return normalized
 
+    def delete_reactions_for_target(self, *, target_type: str, target_id: str) -> int:
+        liked_result = self.collection.delete_many(
+            {"target_type": target_type, "target_id": target_id, "signal": "liked"}
+        )
+        disliked_result = self.collection.delete_many(
+            {"target_type": target_type, "target_id": target_id, "signal": "disliked"}
+        )
+        return int(liked_result.deleted_count) + int(disliked_result.deleted_count)
+
+    def clear_notes_for_target(self, *, target_type: str, target_id: str) -> int:
+        deleted_notes = self.collection.delete_many(
+            {"target_type": target_type, "target_id": target_id, "signal": "note"}
+        )
+        liked_updated = self.collection.update_many(
+            {"target_type": target_type, "target_id": target_id, "signal": "liked"},
+            {"$set": {"notes": ""}},
+        )
+        disliked_updated = self.collection.update_many(
+            {"target_type": target_type, "target_id": target_id, "signal": "disliked"},
+            {"$set": {"notes": ""}},
+        )
+        return (
+            int(deleted_notes.deleted_count)
+            + int(liked_updated.modified_count)
+            + int(disliked_updated.modified_count)
+        )
+
     def list_for_target(
         self, *, target_type: str, target_id: str, limit: int = 100
     ) -> list[dict[str, Any]]:

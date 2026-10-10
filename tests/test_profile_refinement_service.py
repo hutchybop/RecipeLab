@@ -100,6 +100,45 @@ class ProfileRefinementServiceTests(unittest.TestCase):
             self.db["profile_update_suggestions"].docs[1]["status"], "rejected"
         )
 
+    def test_generate_profile_update_suggestions_uses_latest_reaction_per_target(self):
+        self.db["recipes"].docs.append(
+            {
+                "_id": "r1",
+                "title": "Chicken Bowl",
+                "metadata": {"tags": ["spicy"]},
+                "ingredients": [
+                    {"quantity": "1", "unit": "lb", "ingredient": "chicken breast"},
+                ],
+            }
+        )
+        self.db["feedback_events"].docs.extend(
+            [
+                {
+                    "_id": "f2",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "liked",
+                    "created_at": 2,
+                },
+                {
+                    "_id": "f1",
+                    "target_type": "recipe",
+                    "target_id": "r1",
+                    "signal": "disliked",
+                    "created_at": 1,
+                },
+            ]
+        )
+
+        result = generate_profile_update_suggestions(self.db, min_support=1)
+        self.assertGreaterEqual(result["created"], 1)
+        actions = {
+            (item["action"], item["token"])
+            for item in self.db["profile_update_suggestions"].docs
+        }
+        self.assertIn(("add_like", "chicken"), actions)
+        self.assertNotIn(("add_dislike", "chicken"), actions)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -15,6 +15,11 @@ class FakeUpdateResult:
     modified_count: int
 
 
+@dataclass
+class FakeDeleteResult:
+    deleted_count: int
+
+
 class FakeCursor:
     def __init__(self, docs: list[dict[str, Any]]):
         self._docs = docs
@@ -90,6 +95,11 @@ class FakeCollection:
                 self.docs[index] = _apply_update(doc, update)
                 updated += 1
         return FakeUpdateResult(modified_count=updated)
+
+    def delete_many(self, filters: dict[str, Any]) -> FakeDeleteResult:
+        before = len(self.docs)
+        self.docs = [doc for doc in self.docs if not _matches(doc, filters)]
+        return FakeDeleteResult(deleted_count=before - len(self.docs))
 
 
 class FakeDatabase:
