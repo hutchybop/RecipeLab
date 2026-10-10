@@ -3,9 +3,9 @@
 {% block title %}Recipe Library · RecipeLab{% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Recipe Library</h1>
-    <div class="d-flex gap-2">
+  <div class="page-header mb-3">
+    <h1 class="h3 mb-0 text-wrap-anywhere">Recipe Library</h1>
+    <div class="action-row mobile-stack">
       <a class="btn btn-outline-success" href="{{ url_for('web.import_recipe_page') }}">Import Raw Recipe</a>
       <a class="btn btn-primary" href="{{ url_for('web.generate_page') }}">Generate Recipe</a>
     </div>
@@ -25,9 +25,9 @@
     <div class="list-group shadow-sm">
       {% for recipe in recipes %}
         <a class="list-group-item list-group-item-action" href="{{ url_for('web.recipe_detail', recipe_id=recipe['_id']) }}">
-          <div class="d-flex w-100 justify-content-between align-items-center">
-            <h2 class="h6 mb-1">{{ recipe.get('title', 'Untitled') }}</h2>
-            <span class="badge recipe-source-badge {% if recipe.get('source_type') == 'ai' %}recipe-source-badge--ai{% else %}recipe-source-badge--user{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
+          <div class="d-flex w-100 justify-content-between align-items-start gap-2 flex-wrap">
+            <h2 class="h6 mb-1 text-wrap-anywhere flex-grow-1">{{ recipe.get('title', 'Untitled') }}</h2>
+            <span class="badge recipe-source-badge flex-shrink-0 {% if recipe.get('source_type') == 'ai' %}recipe-source-badge--ai{% else %}recipe-source-badge--user{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
           </div>
           <small class="text-muted">Meal: {{ recipe.get('meal_type', '-') }}</small>
         </a>

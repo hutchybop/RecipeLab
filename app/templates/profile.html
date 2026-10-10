@@ -5,9 +5,9 @@
 {% block content %}
   <div class="card border-0 shadow-sm mb-4">
     <div class="card-body p-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Tasting Profile</h1>
-        <form method="post" action="{{ url_for('web.profile_page') }}">
+      <div class="page-header mb-3">
+        <h1 class="h3 mb-0 text-wrap-anywhere">Tasting Profile</h1>
+        <form method="post" action="{{ url_for('web.profile_page') }}" class="action-row mobile-stack">
           <input type="hidden" name="action" value="refresh_suggestions" />
           <button class="btn btn-outline-primary" type="submit">Generate Update Suggestions</button>
         </form>
@@ -55,13 +55,13 @@
         <div class="list-group">
           {% for suggestion in pending_updates %}
             <div class="list-group-item">
-              <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
-                <div>
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-2 align-items-start">
+                <div class="text-wrap-anywhere">
                   <strong>{{ suggestion.get('action') }}</strong>:
                   <span class="text-primary">{{ suggestion.get('token') }}</span>
                   <small class="text-muted d-block">Support: {{ suggestion.get('support_count', 0) }} · {{ suggestion.get('notes', '') }}</small>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="action-row mobile-stack flex-shrink-0">
                   <form method="post" action="{{ url_for('web.apply_profile_suggestion', suggestion_id=suggestion['_id']) }}">
                     <button class="btn btn-sm btn-success" type="submit">Apply</button>
                   </form>
@@ -87,7 +87,7 @@
           {% if applied_updates %}
             <ul class="mb-0">
               {% for suggestion in applied_updates %}
-                <li>
+                <li class="text-wrap-anywhere">
                   <strong>{{ suggestion.get('action') }}</strong>:
                   {{ suggestion.get('token') }}
                   <span class="text-muted">(support: {{ suggestion.get('support_count', 0) }}, updated: {{ suggestion.get('updated_at') }})</span>
@@ -108,7 +108,7 @@
           {% if rejected_updates %}
             <ul class="mb-0">
               {% for suggestion in rejected_updates %}
-                <li>
+                <li class="text-wrap-anywhere">
                   <strong>{{ suggestion.get('action') }}</strong>:
                   {{ suggestion.get('token') }}
                   <span class="text-muted">(support: {{ suggestion.get('support_count', 0) }}, updated: {{ suggestion.get('updated_at') }})</span>

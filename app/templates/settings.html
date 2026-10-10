@@ -18,7 +18,9 @@
           </select>
         </div>
         <div class="col-12">
-          <button class="btn btn-primary" type="submit">Save Model</button>
+          <div class="action-row mobile-stack">
+            <button class="btn btn-primary" type="submit">Save Model</button>
+          </div>
         </div>
       </form>
     </div>
@@ -27,8 +29,8 @@
   <div class="card border-0 shadow-sm">
     <div class="card-body p-4">
       <h2 class="h5">Environment-Managed Configuration (Read-only)</h2>
-      <p class="mb-2"><strong>Provider:</strong> {{ provider or '-' }}</p>
-      <p class="mb-0"><strong>Endpoint:</strong> {{ endpoint or '-' }}</p>
+      <p class="mb-2 text-wrap-anywhere"><strong>Provider:</strong> {{ provider or '-' }}</p>
+      <p class="mb-0 text-wrap-anywhere"><strong>Endpoint:</strong> {{ endpoint or '-' }}</p>
     </div>
   </div>
 {% endblock %}

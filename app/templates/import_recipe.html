@@ -30,8 +30,10 @@
         </div>
 
         <div class="col-12">
-          <button class="btn btn-success" type="submit">Convert for Review</button>
-          <a class="btn btn-outline-secondary" href="{{ url_for('web.suggestions_page') }}">View Suggestions</a>
+          <div class="action-row mobile-stack">
+            <button class="btn btn-success" type="submit">Convert for Review</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('web.suggestions_page') }}">View Suggestions</a>
+          </div>
         </div>
       </form>
     </div>

@@ -78,8 +78,10 @@
         </div>
 
         <div class="col-12">
-          <button class="btn btn-primary" type="submit">Save Changes</button>
-          <a class="btn btn-outline-secondary" href="{{ url_for('web.recipe_detail', recipe_id=recipe['_id']) }}">Cancel</a>
+          <div class="action-row mobile-stack">
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('web.recipe_detail', recipe_id=recipe['_id']) }}">Cancel</a>
+          </div>
         </div>
       </form>
     </div>

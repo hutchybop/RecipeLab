@@ -70,6 +70,18 @@ body.app-body {
   gap: 0.5rem;
 }
 
+.action-row > form {
+  margin: 0;
+}
+
+.action-row .btn {
+  white-space: normal;
+}
+
+.feedback-note-input {
+  max-width: 360px;
+}
+
 .text-wrap-anywhere {
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -84,9 +96,20 @@ body.app-body {
   .app-navbar-nav-links .nav-link {
     padding: 0.625rem 0;
   }
+}
 
+@media (max-width: 575.98px) {
   .mobile-stack > * {
     width: 100%;
+  }
+
+  .mobile-stack > form > .btn,
+  .mobile-stack > .btn {
+    width: 100%;
+  }
+
+  .feedback-note-input {
+    max-width: none;
   }
 }
 

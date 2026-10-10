@@ -3,8 +3,8 @@
 {% block title %}Recipe Detail · RecipeLab{% endblock %}
 
 {% block content %}
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">{{ recipe.get('title', 'Untitled recipe') }}</h1>
+  <div class="page-header mb-3">
+    <h1 class="h3 mb-0 text-wrap-anywhere">{{ recipe.get('title', 'Untitled recipe') }}</h1>
     <span class="badge recipe-source-badge {% if recipe.get('source_type') == 'ai' %}recipe-source-badge--ai{% else %}recipe-source-badge--user{% endif %}">{{ recipe.get('source_type', 'user') }}</span>
   </div>
 
@@ -80,10 +80,10 @@
         <input type="hidden" name="target_type" value="recipe" />
         <input type="hidden" name="target_id" value="{{ recipe['_id'] }}" />
         <input type="hidden" name="return_to" value="{{ request.path }}" />
-        <input class="form-control" style="max-width: 360px" type="text" name="notes" placeholder="Optional note" value="{{ feedback_state.get('latest_note', '') }}" />
-        <button class="btn {% if feedback_state.get('reaction') == 'liked' %}btn-success{% else %}btn-outline-success{% endif %}" type="submit" name="signal" value="liked">Liked</button>
-        <button class="btn {% if feedback_state.get('reaction') == 'disliked' %}btn-danger{% else %}btn-outline-danger{% endif %}" type="submit" name="signal" value="disliked">Disliked</button>
-        <button class="btn {% if feedback_state.get('latest_note') %}btn-secondary{% else %}btn-outline-secondary{% endif %}" type="submit" name="signal" value="note">Add Note</button>
+        <input class="form-control feedback-note-input w-100" type="text" name="notes" placeholder="Optional note" value="{{ feedback_state.get('latest_note', '') }}" />
+        <button class="btn w-100 w-sm-auto {% if feedback_state.get('reaction') == 'liked' %}btn-success{% else %}btn-outline-success{% endif %}" type="submit" name="signal" value="liked">Liked</button>
+        <button class="btn w-100 w-sm-auto {% if feedback_state.get('reaction') == 'disliked' %}btn-danger{% else %}btn-outline-danger{% endif %}" type="submit" name="signal" value="disliked">Disliked</button>
+        <button class="btn w-100 w-sm-auto {% if feedback_state.get('latest_note') %}btn-secondary{% else %}btn-outline-secondary{% endif %}" type="submit" name="signal" value="note">Add Note</button>
       </form>
 
       <hr />
@@ -104,7 +104,7 @@
     </div>
   </div>
 
-  <div class="d-flex flex-wrap gap-2">
+  <div class="action-row mobile-stack">
     <a class="btn btn-outline-dark" href="{{ url_for('web.export_recipe_pdf', recipe_id=recipe['_id']) }}">Export PDF</a>
     <a class="btn btn-outline-primary" href="{{ url_for('web.edit_recipe', recipe_id=recipe['_id']) }}">Edit Recipe</a>
     <form method="post" action="{{ url_for('web.delete_recipe', recipe_id=recipe['_id']) }}" onsubmit="return confirm('Delete this recipe?');">

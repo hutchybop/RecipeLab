@@ -78,7 +78,7 @@
           <textarea class="form-control" id="notes" name="notes" rows="4">{{ recipe.get('notes', [])|join('\n') }}</textarea>
         </div>
 
-        <div class="col-12 d-flex flex-wrap gap-2">
+        <div class="col-12 action-row mobile-stack">
           <button class="btn btn-primary" type="submit">Save Suggestion Changes</button>
           <a class="btn btn-success" href="{{ url_for('web.suggestion_detail', suggestion_id=suggestion['_id']) }}">Back to Review</a>
         </div>

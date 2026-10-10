@@ -513,7 +513,7 @@ Update this file at every checkpoint.
 
 ### Web UI Responsiveness Status Tracker
 - Web UI Phase 1: `complete`
-- Web UI Phase 2: `not_started`
+- Web UI Phase 2: `complete`
 - Web UI Phase 3: `not_started`
 
 ### Checkpoint Log Template
@@ -875,6 +875,30 @@ Use this template for each checkpoint entry:
 
 ---
 
+## Checkpoint 2026-10-10 (Web UI Phase 2 Implementation)
+
+- Phase: Web UI Phase 2 / Page Layout Responsiveness (Headers, Actions, Forms)
+- Status: `in_progress`
+- What changed:
+  - Applied shared responsive header/action patterns across web templates (`dashboard`, `recipes`, `suggestions`, `recipe_detail`, `suggestion_detail`, `profile`, `settings`, `generate`, `import`, `recipe_edit`, `suggestion_edit`).
+  - Updated dense button/control areas to mobile-first stacking behavior while keeping desktop usability.
+  - Improved wrapping resilience for long titles/content in list rows, headers, profile entries, and settings read-only values.
+  - Added responsive utility/foundation CSS enhancements for action rows, form/button behavior, and feedback input sizing.
+  - Added manual UAT checklist: `docs/checklists/phase-10-uat.md`.
+- Tests run:
+  - `.venv/bin/python -m unittest tests.test_web_routes -v`
+- User validation outcome:
+  - Pending manual responsive walkthrough with `docs/checklists/phase-10-uat.md`.
+- Risks/issues:
+  - `none`
+- Decision(s):
+  - Keep Web UI Phase 2 in `in_progress` until user validation gate is completed.
+- Next actions:
+  - Run `docs/checklists/phase-10-uat.md` across defined viewport matrix.
+  - Promote Web UI Phase 2 to `complete` after user sign-off.
+
+---
+
 ## Change Log
 
 ### 2026-10-07
@@ -911,3 +935,4 @@ Use this template for each checkpoint entry:
 ### 2026-10-10
 - Added post-MVP Web UI responsiveness phases (Web UI Phase 1/2/3) to the project plan.
 - Completed Web UI Phase 1 (mobile navbar foundation), including manual checklist creation and user validation pass.
+- Implemented Web UI Phase 2 layout responsiveness updates across key templates and added Phase 10 UAT checklist for manual validation.
