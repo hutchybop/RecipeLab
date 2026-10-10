@@ -1,3 +1,18 @@
+## Session 17
+### Saturday October 10th
+<br>
+
+**Summary:** This session improved feedback visibility in the recipe library by displaying each recipe’s latest liked/disliked reaction and note status. It added repository support for loading feedback across recipe targets and expanded web route tests to verify the badges.
+
+**Git Branch:** main <br>
+**Git commits:** <br>
+9590a94
+
+**Session git history:**
+- add recipe library feedback badges 20261010-1920 - *Displayed liked/disliked and note badges for recipes using their feedback state, and added route test coverage.*
+---
+<br>
+
 ## Session 16
 ### Saturday October 10th
 <br>
