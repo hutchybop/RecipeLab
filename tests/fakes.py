@@ -114,6 +114,10 @@ class FakeDatabase:
 
 def _matches(document: dict[str, Any], filters: dict[str, Any]) -> bool:
     for key, value in filters.items():
+        if isinstance(value, dict) and "$in" in value:
+            if document.get(key) not in value["$in"]:
+                return False
+            continue
         if document.get(key) != value:
             return False
     return True

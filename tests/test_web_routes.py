@@ -252,6 +252,51 @@ class WebRoutesTests(unittest.TestCase):
         self.assertIn(b"Great texture", response.data)
 
     @patch("app.blueprints.web.routes.get_mongo_db")
+    def test_recipes_page_shows_reaction_and_note_badges(self, mock_db):
+        mock_db.return_value = self.fake_db
+        self.fake_db["recipes"].docs.extend(
+            [
+                {"_id": "r-liked", "title": "Liked Recipe", "meal_type": "main"},
+                {"_id": "r-disliked", "title": "Disliked Recipe", "meal_type": "main"},
+                {"_id": "r-note", "title": "Noted Recipe", "meal_type": "main"},
+            ]
+        )
+        self.fake_db["feedback_events"].docs.extend(
+            [
+                {
+                    "target_type": "recipe",
+                    "target_id": "r-liked",
+                    "signal": "liked",
+                    "notes": "Keep this note",
+                    "created_at": 3,
+                },
+                {
+                    "target_type": "recipe",
+                    "target_id": "r-disliked",
+                    "signal": "disliked",
+                    "notes": "",
+                    "created_at": 2,
+                },
+                {
+                    "target_type": "recipe",
+                    "target_id": "r-note",
+                    "signal": "note",
+                    "notes": "Try more lemon",
+                    "created_at": 1,
+                },
+            ]
+        )
+
+        response = self.client.get("/recipes")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Liked Recipe", response.data)
+        self.assertIn(b"Disliked", response.data)
+        self.assertIn(b"Noted Recipe", response.data)
+        self.assertIn(b">Note</span>", response.data)
+        self.assertIn(b"Keep this note", response.data)
+
+    @patch("app.blueprints.web.routes.get_mongo_db")
     def test_suggestion_detail_shows_feedback_state_and_history(self, mock_db):
         mock_db.return_value = self.fake_db
         self.fake_db["suggestions"].docs.append(
@@ -307,6 +352,7 @@ class WebRoutesTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(self.fake_db["feedback_events"].docs), 1)
+        self.assertEqual(self.fake_db["feedback_events"].docs[0]["notes"], "Great")
 
     @patch("app.blueprints.web.routes.get_mongo_db")
     def test_feedback_post_replaces_existing_reaction(self, mock_db):

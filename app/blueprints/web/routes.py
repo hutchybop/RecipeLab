@@ -319,12 +319,26 @@ def recipes_page() -> str:
         selected_meal_type = ""
         flash("Invalid meal type filter ignored.", "warning")
 
-    recipes = RecipesRepository(get_mongo_db()).list(
+    db = get_mongo_db()
+    recipes = RecipesRepository(db).list(
         meal_type=selected_meal_type or None, limit=300
     )
+    recipe_ids = [str(recipe["_id"]) for recipe in recipes]
+    feedback_by_recipe: dict[str, list[dict]] = {
+        recipe_id: [] for recipe_id in recipe_ids
+    }
+    for event in FeedbackEventsRepository(db).list_for_targets(
+        target_type="recipe", target_ids=recipe_ids
+    ):
+        feedback_by_recipe.setdefault(str(event.get("target_id", "")), []).append(event)
+    feedback_states = {
+        recipe_id: _feedback_state_from_events(events)
+        for recipe_id, events in feedback_by_recipe.items()
+    }
     return render_template(
         "recipes.html",
         recipes=recipes,
+        feedback_states=feedback_states,
         meal_types=sorted(MEAL_TYPES),
         selected_meal_type=selected_meal_type,
     )

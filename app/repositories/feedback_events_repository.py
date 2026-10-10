@@ -74,6 +74,16 @@ class FeedbackEventsRepository:
         )
         return list(cursor)
 
+    def list_for_targets(
+        self, *, target_type: str, target_ids: list[str]
+    ) -> list[dict[str, Any]]:
+        if not target_ids:
+            return []
+        cursor = self.collection.find(
+            {"target_type": target_type, "target_id": {"$in": target_ids}}
+        ).sort("created_at", DESCENDING)
+        return list(cursor)
+
     def list_recent(self, *, limit: int = 300) -> list[dict[str, Any]]:
         return list(
             self.collection.find({}).sort("created_at", DESCENDING).limit(limit)
